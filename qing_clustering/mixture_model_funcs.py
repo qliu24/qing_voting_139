@@ -9,6 +9,7 @@ def compt_weights(lbs, data):
     for kk in range(lbs.shape[0]):
         lb = lbs[kk]
         prob = np.sum(data * lb, axis=1)/np.sum(lb) + 1e-3
+        # prob = (np.sum(data * lb, axis=1)+1)/(np.sum(lb)+2)
         try:
             assert(np.all(prob>0))
             assert(np.all(prob<1))

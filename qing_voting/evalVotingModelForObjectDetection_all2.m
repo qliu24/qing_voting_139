@@ -1,5 +1,6 @@
-function det_debug()
-config='config_qing3';
+% Evaluate voting model for object detection
+
+function evalVotingModelForObjectDetection_all(config)
 try
     eval(config)
 catch
@@ -41,7 +42,72 @@ dir_obj_anno = sprintf(Dataset.anno_dir, model_category);
 
                                                  
 %% process ground-truth annotations
-load(file_gt_obj_anno, 'gt', 'n_pos');
+try
+     load(file_gt_obj_anno, 'gt', 'n_pos');
+catch
+    % collect groundtruth object annotations from all images
+    fprintf(' extract ground truth objects ...\n');
+    
+    n_pos = 0;
+    gt(img_num) = struct('bbox', [], 'diff', [], 'det', []);
+    for n = 1: img_num
+        img_name = img_list{1}{n};
+        
+        file_img = sprintf('%s/%s.JPEG', dir_img, img_name);
+        img = imread(file_img);
+        [hgt_img, wid_img, ~] = size(img);
+        
+        file_obj_anno = sprintf('%s/%s.mat', dir_obj_anno, img_name);
+        assert(exist(file_obj_anno, 'file') > 0);
+        
+        anno = load(file_obj_anno);
+        anno = anno.record;      
+        assert(anno.imgsize(2) == hgt_img);
+        assert(anno.imgsize(1) == wid_img);
+        
+        for j = 1: length(anno.objects)
+            if strcmp(anno.objects(j).class, model_category)        
+                  gt_bbox_cls = anno.objects(j).bbox;
+                  gt_bbox_cls(1) = max(ceil(gt_bbox_cls(1)), 1);            % x_min
+                  gt_bbox_cls(2) = max(ceil(gt_bbox_cls(2)), 1);            % y_min
+                  gt_bbox_cls(3) = min(floor(gt_bbox_cls(3)), wid_img);     % x_max
+                  gt_bbox_cls(4) = min(floor(gt_bbox_cls(4)), hgt_img);     % y_max
+        
+                  gt(n).bbox = cat(2, gt(n).bbox, gt_bbox_cls');                % ~ [4 num_bbox]
+                  gt(n).diff = cat(1, gt(n).diff, anno.objects(j).difficult);           % ~ [num_bbox 1]
+            end
+        end
+        gt(n).det = false([size(gt(n).bbox, 2), 1]);                          % ~ [num_bbox 1]
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        if isempty(gt(n).bbox)
+            keyboard;
+        end
+        
+        n_pos = n_pos + sum(~gt(n).diff);
+    end % n
+
+    save(file_gt_obj_anno, 'gt', 'n_pos', '-v7.3');
+end
+
+% % hash image ids
+% hash=VOChash_init(gtids);
+% 
+% npos=0;
+% gt(length(gtids))=struct('BB',[],'diff',[],'det',[]);
+% for i=1:length(gtids)
+%     % extract objects of class
+%     clsinds = strmatch(cls,{recs(i).objects(:).class},'exact');
+%     gt(i).BB = cat(1,recs(i).objects(clsinds).bbox)';
+%     gt(i).diff = [recs(i).objects(clsinds).difficult];
+%     gt(i).det = false(length(clsinds),1);
+%     npos = npos + sum(~gt(i).diff);
+% end
+
+%% compute detection scores 
+try
+    load(file_perf_eval_all, 'boxes', 'scores', 'img_ids');
+catch
 
 fprintf(' compute scores and do NMS for detection result:');
 
@@ -78,11 +144,11 @@ n_obj = 0;
 for n = 1: img_num_all
     % compute scores for proposal bounding boxes
     num_bbox = size(det_all_m{n}.score, 1);
-    scores{n} = score_rst2{n}(:,obj_col(model_category));
+    scores{n} = score_rst{n}(:,obj_col(model_category));
     boxes{n} = det_all_m{n}.box;
     
-    nms_list = nms_list_all{n};
     % nms_list = nms([boxes{n}, scores{n}], Eval.nms_bbox_ratio);
+    nms_list = nms_list_all{n};
     boxes{n} = boxes{n}(nms_list, :);
     scores{n} = scores{n}(nms_list);
     
@@ -109,6 +175,9 @@ end % n: image index
 fprintf('\n');
 assert(n_obj==img_num);
 
+% save(file_perf_eval_all, 'boxes', 'scores', 'img_ids', '-v7.3');
+
+end
 
 %% evaluate detection performance
 fprintf(' evaluate P-R curve and AP ...\n');
@@ -131,11 +200,14 @@ boxes = boxes(:, si);
 nd = length(scores);
 tp = zeros([nd, 1]);
 fp = zeros([nd, 1]);
-d1=0;
-%%
-
-for d = d1+1: nd
+tic;
+for d = 1: nd
     % display progress
+    if toc > 1
+        fprintf('%s: pr: compute: %d|%d\n', category, d, nd);
+        drawnow;
+        tic;
+    end
     
     % find ground truth image
     i = img_ids(d);   % i: image id
@@ -180,48 +252,30 @@ for d = d1+1: nd
             fp(d)=1;                    % false positive
         end
     end % if i == 0
-    
-    if fp(d) == 1
-        d1 = d;
-        break
-    end
+end % d: detection
+
+% compute precision/recall
+fp = cumsum(fp);
+tp = cumsum(tp);
+rec = tp / n_pos;
+prec = tp ./ (fp + tp);
+
+ap = VOCap(rec, prec);
+fprintf(' AP = %2.1f', 100 * ap);
+
+% save(file_perf_eval_all, 'fp', 'tp', 'rec', 'prec', 'ap', '-append');
+
+Eval.vis_prc = true;
+if Eval.vis_prc
+    % plot precision/recall
+    plot(rec, prec, '-');
+    grid;
+    xlabel 'recall'
+    ylabel 'precision'
+    title(sprintf('class: %s, set: %s_%s, AP = %2.1f', ...
+           category, dataset_suffix, set_type, 100*ap));
 end
 
-n=img_ids(d);
-n2 = img_ids_all(d)
-bbox = boxes(:,d);
+end % end of function
 
-if n>0
-    img_name = img_list{1}{n};
-    img_name2 = img_list_all{1}{n2};
-    assert(strcmp(img_name, img_name2));
-    assert(strcmp(img_list_all{3}{n2}, model_category));
-    file_img = sprintf('%s/%s.JPEG', dir_img, img_name);
-    img = imread(file_img);
-    img1 = img(bbox(2):bbox(4), bbox(1):bbox(3),:);
-    
-    gtbox=gt(n).bbox;
-    img2 = img(gtbox(2):gtbox(4), gtbox(1):gtbox(3),:);
-    imshowpair(img1, img2, 'montage');
-    
-    ov=0;
-    bi = [max(bbox(1), gtbox(1)); max(bbox(2), gtbox(2)); min(bbox(3), gtbox(3)); min(bbox(4), gtbox(4))];   % intersection
-    iw = bi(3) - bi(1) + 1;
-    ih = bi(4) - bi(2) + 1;
-    if (iw > 0) && (ih > 0)                
-        ua = (bbox(3) - bbox(1) + 1) * (bbox(4) - bbox(2) + 1) + ...
-                         (gtbox(3) - gtbox(1) + 1) * (gtbox(4) - gtbox(2) + 1) - ...
-                          iw * ih;    % area of union
-        ov = iw * ih / ua;
-    end
-    ov
-else
-    img_name = img_list_all{1}{n2};
-    dir_img_oo = sprintf(Dataset.img_dir, img_list_all{3}{n2});
-    file_img = sprintf('%s/%s.JPEG', dir_img_oo, img_name);
-    img = imread(file_img);
-    img1 = img(bbox(2):bbox(4), bbox(1):bbox(3),:);
-    imshowpair(img, img1, 'montage');
-    
-end
-end
+

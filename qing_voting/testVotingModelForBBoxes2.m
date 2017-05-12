@@ -55,7 +55,7 @@ num_batch = length(dir(fullfile(dir_feat_bbox_proposals, ...
 det = cell([img_num, 1]);   % det{n} ~ struct('img_path', 'img_siz', 'box', 'box_siz', 'score')                              
 n = 0;             
 fprintf('compute voting scores ...');
-load(vc_stat_file);
+% load(vc_stat_file);
 for i = 1: num_batch
     fprintf(' for batch %d of %d:', i, num_batch);
     
@@ -78,9 +78,9 @@ for i = 1: num_batch
         det{n}.score = zeros([num_box, 1]);
         for j = 1: num_box
             if strcmp(model_type, 'single')
-                det{n}.score(j, 1) = comptScores2(feat{cnt_img}.r{j}, weight_obj, logZ, selected_vc_msk);
+                det{n}.score(j, 1) = comptScores(feat{cnt_img}.r{j}, weight_obj, logZ);
             elseif strcmp(model_type, 'mix')
-                det{n}.score(j, 1) = comptScoresM(feat{cnt_img}.r{j}, weight_objs, logZs, log_priors, selected_vc_msk);
+                det{n}.score(j, 1) = comptScoresM(feat{cnt_img}.r{j}, weight_objs, logZs, log_priors);
             else
                 error('Error: unknown model_type');
             end                
@@ -106,13 +106,14 @@ function score = comptScoresM(input, weight_objs, logZs, log_priors, msk)
     score_i = zeros(length(weight_objs),1);
     for mm=1:length(weight_objs)
         if nargin>4
-            logllk = comptScores2(input, weight_objs{mm}, logZs{mm}, msk);
+            logllk = comptScores(input, weight_objs{mm}, logZs{mm}, msk);
         else
-            logllk = comptScores2(input, weight_objs{mm}, logZs{mm});
+            logllk = comptScores(input, weight_objs{mm}, logZs{mm});
         end
         
         score_i(mm) = logllk+log_priors{mm};
+        % score_i(mm) = logllk;
     end
     score = logsumexp(score_i);
+    % score = max(score_i);
 end
-

@@ -43,8 +43,8 @@ else
       h = yy2-yy1+1;
       if w > 0 && h > 0
         % compute overlap 
-%        o = w * h / area(j);
-        o = w * h / (area(i)+area(j)-w*h);
+        o = w * h / area(j);
+        % o = w * h / (area(i)+area(j)-w*h);
         if o > overlap
           suppress = [suppress; pos];
         end

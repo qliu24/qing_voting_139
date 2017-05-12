@@ -1,3 +1,4 @@
+global model_category;
 Data.root_dir2 = '/media/zzs/4TB/qingliu/qing_intermediate/';
 dir_det_result = fullfile(Data.root_dir2, 'result');
 model_type = 'single';
@@ -5,7 +6,7 @@ model_suffix = sprintf('%s.mat', model_type);
 
 dataset_suffix = 'mergelist_rand';
 set_type = 'test';
-model_category = 'car';
+% model_category = 'car';
 
 file_det_result_all = fullfile(dir_det_result, sprintf('props_det_%s_%s_%s_%s_%s', ...
                                                        model_category, 'all', dataset_suffix, set_type, model_suffix));

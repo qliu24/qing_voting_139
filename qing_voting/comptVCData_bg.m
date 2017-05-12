@@ -23,7 +23,7 @@ try
     assert(exist('r_set', 'var')>0)
 catch
     fprintf('compute and cache VC distance data for "%s" set backgrounds ...\n', set_type);
-    VC.num = 223;
+    VC.num = 208;
     VC.layer = layer_name;
     
     feat_dim = featDim_map(VC.layer);

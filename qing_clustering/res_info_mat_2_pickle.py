@@ -4,7 +4,7 @@ import pickle
 import glob
 objects = ['car', 'aeroplane', 'bicycle', 'bus', 'motorbike', 'train']
 for oo in objects:
-    filename = '/media/zzs/4TB/qingliu/qing_intermediate/all_K223_res_info/res_info_{0}_train.mat'.format(oo)
+    filename = '/media/zzs/4TB/qingliu/qing_intermediate/all_K208_res_info/res_info_{0}_train.mat'.format(oo)
     f = h5py.File(filename)
     dic1 = f['res_info']
     len1 = dic1.shape[0]

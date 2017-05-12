@@ -1,5 +1,5 @@
 function score = comptScores(input, obj_weight, logZ, msk)  
-    input = input<0.7;
+    input = input<0.65;
     [wi,hi,ci] = size(input);
     [wo,ho,co] = size(obj_weight);
     assert(ci == co);

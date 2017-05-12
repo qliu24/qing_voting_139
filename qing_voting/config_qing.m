@@ -1,14 +1,14 @@
-global category;
+% global category model_category;
 dataset_suffix = 'mergelist_rand';
 layer_name = 'pool4';
-% category = 'bus';
-model_category = 'car';
+category = 'all';
+model_category = 'train';
 set_type = 'test';
 
 model_type = 'mix'; % or single
 model_suffix = sprintf('%s.mat', model_type);
 
-Eval.nms_bbox_ratio = 0.1;
+Eval.nms_bbox_ratio = 0.3;
 %% feature parameter
 caffe_dim = 224; % caffe input dimension in deploy protobuf
 layer_set = {'pool1', 'pool2', 'pool3', 'pool4', 'pool5'};
@@ -35,19 +35,19 @@ feat_dim = featDim_map(layer_name);
 
 VC.dict_dir = './intermediate/dictionary/';
 VC.layer = layer_name;
-VC.num = 216;
+VC.num = 208;
 
 file_VC_dict = fullfile(VC.dict_dir, sprintf('dictionary_imagenet_%s_vgg16_%s_K%i_norm_nowarp_prune_%i.mat', 'all', VC.layer, VC.num, feat_dim));
 
 %% Caffe parameter
-% Caffe.dir = '/media/zzs/5TB/tmp/caffe/';
-% addpath(fullfile(Caffe.dir, 'matlab'));
-% 
-% load('./ilsvrc_2012_mean.mat');
-% model = '/media/zzs/SSD1TB/zzs/surgeried/VGG_ILSVRC_16_layers_deploy_pool5.prototxt';
-% weights = '/media/zzs/SSD1TB/zzs/surgeried/surgery_weight';
-% mean_pixel = mean(mean(mean_data, 1), 2);
-% Caffe.gpu_id = 1;
+Caffe.dir = '/media/zzs/5TB/tmp/caffe/';
+addpath(fullfile(Caffe.dir, 'matlab'));
+
+load('./ilsvrc_2012_mean.mat');
+model = '/media/zzs/SSD1TB/zzs/surgeried/VGG_ILSVRC_16_layers_deploy_pool5.prototxt';
+weights = '/media/zzs/SSD1TB/zzs/surgeried/surgery_weight';
+mean_pixel = mean(mean(mean_data, 1), 2);
+Caffe.gpu_id = 1;
 
 
 %% set image pathes
@@ -95,19 +95,19 @@ elseif strcmp(model_category, 'bg6')
 end
 
 temp_dim = containers.Map;
-temp_dim('car') = [17 55 216];
-temp_dim('bus') = [25 52 216];
-temp_dim('aeroplane') = [22 56 216];
-temp_dim('train') = [35 56 216];
-temp_dim('bicycle') = [30 33 216];
-temp_dim('motorbike') = [37 35 216];
+temp_dim('car') = [17 55 208];
+temp_dim('bus') = [25 52 208];
+temp_dim('aeroplane') = [22 56 208];
+temp_dim('train') = [35 56 208];
+temp_dim('bicycle') = [30 33 208];
+temp_dim('motorbike') = [37 35 208];
 
-file_det_result = fullfile(dir_det_result, sprintf('props_det_2_%s_%s_%s_%s_%s', ...
+file_det_result = fullfile(dir_det_result, sprintf('props_det_%s_%s_%s_%s_%s', ...
                                                    model_category, category, dataset_suffix, set_type, model_suffix));
 file_det_result_all = fullfile(dir_det_result, sprintf('props_det_%s_%s_%s_%s_%s', ...
                                                        model_category, category, dataset_suffix, set_type, model_suffix));
 file_det_result_all_bg1 = fullfile(dir_det_result, sprintf('props_det_%s_%s_%s_%s_%s', ...
-                                                       'bg', category, dataset_suffix, set_type, 'single.mat'));
+                                                       'bg1', category, dataset_suffix, set_type, 'single.mat'));
 file_det_result_all_bg2 = fullfile(dir_det_result, sprintf('props_det_%s_%s_%s_%s_%s', ...
                                                        'bg2', category, dataset_suffix, set_type, 'single.mat'));
 file_det_result_all_bg3 = fullfile(dir_det_result, sprintf('props_det_%s_%s_%s_%s_%s', ...
@@ -132,7 +132,7 @@ file_det_result_all_bg12 = fullfile(dir_det_result, sprintf('props_det_%s_%s_%s_
                                                        'train', category, dataset_suffix, set_type, 'mix.mat'));
 
 
-file_det_result_all_bg = cell(6,1);
+file_det_result_all_bg = cell(12,1);
 file_det_result_all_bg{1} = file_det_result_all_bg1;
 file_det_result_all_bg{2} = file_det_result_all_bg2;
 file_det_result_all_bg{3} = file_det_result_all_bg3;

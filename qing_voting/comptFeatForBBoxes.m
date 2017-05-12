@@ -143,4 +143,5 @@ for i = 1: num_batch
     
 end % i: stack index
 
+caffe.reset_all();
 end % end of function
