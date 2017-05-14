@@ -39,7 +39,7 @@ samp_size = 100; % number of patches per image in dictionary_nowarp
 % fprintf('merge_all_cat_dict');
 % merge_all_cat_dict(config, samp_size);
 
-category = 'all';
+category = 'bkmb';
 
 fprintf('cluster');
 cluster(config);

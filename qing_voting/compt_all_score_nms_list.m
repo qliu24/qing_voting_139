@@ -79,7 +79,22 @@ for n = 1: img_num_all
     assert(num_bbox == size(det_all{n}.score,1));
     
     % do NMS
-    score_highest = max(score_rst2{n}, [], 2);
+    score_highest = max(score_rst{n}, [], 2);
+    
+    % ad hoc thing
+%     [~, si] = sort(-score_highest);
+%     height = det_all{n}.img_siz(1);
+%     width = det_all{n}.img_siz(2);
+%     topn=5;
+%     bbox_area = zeros(topn,1);
+%     for mm = 1:topn
+%         bbmm = boxes{n}(si(mm), :);
+%         bbmm = [max(ceil(bbmm(1)), 1), max(ceil(bbmm(2)), 1), min(floor(bbmm(3)), width), min(floor(bbmm(4)), height)];
+%         bbox_area(mm) = (bbmm(3)-bbmm(1))*(bbmm(4)-bbmm(2));
+%     end
+%     [~, biggest_i] = max(bbox_area);
+%     score_highest(si(biggest_i)) = score_highest(si(biggest_i))+100;
+%     
     nms_list_all{n} = nms([boxes{n}, score_highest], 0.3);
     
     if mod(n, 50) == 0
@@ -87,5 +102,19 @@ for n = 1: img_num_all
     end
 end 
 
+nms_list_all2 = cell([img_num_all 1]);
+for n = 1: img_num_all
+    % compute scores for proposal bounding boxes
+    boxes{n} = det_all{n}.box;
+    
+    % do NMS
+    score_highest = max(score_rst2{n}, [], 2);
+    nms_list_all2{n} = nms([boxes{n}, score_highest], 0.3);
+    
+    if mod(n, 50) == 0
+        fprintf(' %d', n);
+    end
+end
+
 savefn = fullfile(dir_det_result,'all_score_nms_list.mat');
-save(savefn, 'nms_list_all', 'score_rst', 'score_rst2', '-v7.3');
+save(savefn, 'nms_list_all', 'nms_list_all2', 'score_rst', 'score_rst2', '-v7.3');

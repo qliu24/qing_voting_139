@@ -2,7 +2,7 @@
 dataset_suffix = 'mergelist_rand';
 layer_name = 'pool4';
 category = 'all';
-model_category = 'aeroplane';
+model_category = 'bicycle';
 set_type = 'test';
 
 model_type = 'mix'; % or single

@@ -46,7 +46,7 @@ for n=1:img_num
     end 
 end
 
-VC.res_info = '/media/zzs/4TB/qingliu/qing_intermediate/all_K208_res_info/res_info_%s_%s.mat';
+VC.res_info = '/media/zzs/4TB/qingliu/qing_intermediate/bkmb_K208_res_info/res_info_%s_%s.mat';
 save(sprintf(VC.res_info, category, set_type), 'res_info', '-v7.3');
 
 end % end of function

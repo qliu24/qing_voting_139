@@ -19,10 +19,10 @@ switch set_type
 end
 
 
-try
-    load(file_cache_VC_data, 'r_set')
-    assert(exist('r_set', 'var')>0)
-catch
+% try
+%     load(file_cache_VC_data, 'r_set')
+%     assert(exist('r_set', 'var')>0)
+% catch
     fprintf('compute and cache VC distance data for "%s" set ...\n', set_type);
     VC.num = 208
     VC.layer = layer_name
@@ -30,7 +30,7 @@ catch
     feat_dim = featDim_map(VC.layer);
     
     %% load VC dictionary
-    load(sprintf(Dictionary.new_dir, 'all', layer_name, VC.num), 'centers');
+    load(sprintf(Dictionary.new_dir, 'bkmb', layer_name, VC.num), 'centers');
     
     % 'centers' ~ [feat_dim, num_VCs]
     assert(size(centers, 1) == feat_dim);
@@ -68,11 +68,11 @@ catch
     end
     
     if exist(file_cache_VC_data, 'file')
-        save(file_cache_VC_data, 'r_set', '-append');
+        save(file_cache_VC_data, 'r_set', 'feat_set', '-v7.3');
     else
         save(file_cache_VC_data, 'r_set', '-v7.3');
     end
-end
+% end
 
 end % end of function
 

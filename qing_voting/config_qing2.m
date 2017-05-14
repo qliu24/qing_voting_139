@@ -37,7 +37,7 @@ VC.dict_dir = './intermediate/dictionary/';
 VC.layer = layer_name;
 VC.num = 208;
 
-file_VC_dict = fullfile(VC.dict_dir, sprintf('dictionary_imagenet_%s_vgg16_%s_K%i_norm_nowarp_prune_%i.mat', 'all', VC.layer, VC.num, feat_dim));
+file_VC_dict = fullfile(VC.dict_dir, sprintf('dictionary_imagenet_%s_vgg16_%s_K%i_norm_nowarp_prune_%i.mat', 'bkmb', VC.layer, VC.num, feat_dim));
 
 %% Caffe parameter
 Caffe.dir = '/media/zzs/5TB/tmp/caffe/';

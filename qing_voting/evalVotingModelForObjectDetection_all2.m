@@ -168,7 +168,7 @@ for n = 1: img_num_all
 %         vp_labels{n} = vp_labels{n}(valid_score_box);
 %     end
     
-    if mod(n, 50) == 0
+    if mod(n, 200) == 0
         fprintf(' %d', n);
     end
 end % n: image index
@@ -265,7 +265,7 @@ fprintf(' AP = %2.1f', 100 * ap);
 
 % save(file_perf_eval_all, 'fp', 'tp', 'rec', 'prec', 'ap', '-append');
 
-Eval.vis_prc = true;
+Eval.vis_prc = false;
 if Eval.vis_prc
     % plot precision/recall
     plot(rec, prec, '-');

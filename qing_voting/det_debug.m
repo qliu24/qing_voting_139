@@ -78,10 +78,10 @@ n_obj = 0;
 for n = 1: img_num_all
     % compute scores for proposal bounding boxes
     num_bbox = size(det_all_m{n}.score, 1);
-    scores{n} = score_rst2{n}(:,obj_col(model_category));
+    scores{n} = score_rst{n}(:,obj_col(model_category));
     boxes{n} = det_all_m{n}.box;
     
-    nms_list = nms_list_all{n};
+    nms_list = nms_list_all2{n};
     % nms_list = nms([boxes{n}, scores{n}], Eval.nms_bbox_ratio);
     boxes{n} = boxes{n}(nms_list, :);
     scores{n} = scores{n}(nms_list);
