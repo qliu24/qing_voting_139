@@ -9,6 +9,7 @@ model_type = 'single'; % or single
 model_suffix = sprintf('%s.mat', model_type);
 
 Eval.nms_bbox_ratio = 0.3;
+vc_magic_thrh = 0.67;
 %% feature parameter
 caffe_dim = 224; % caffe input dimension in deploy protobuf
 layer_set = {'pool1', 'pool2', 'pool3', 'pool4', 'pool5'};
@@ -40,29 +41,29 @@ VC.num = 208;
 file_VC_dict = fullfile(VC.dict_dir, sprintf('dictionary_imagenet_%s_vgg16_%s_K%i_norm_nowarp_prune_%i.mat', 'bkmb', VC.layer, VC.num, feat_dim));
 
 %% Caffe parameter
-Caffe.dir = '/media/zzs/5TB/tmp/caffe/';
-addpath(fullfile(Caffe.dir, 'matlab'));
+% Caffe.dir = '/media/zzs/5TB/tmp/caffe/';
+% addpath(fullfile(Caffe.dir, 'matlab'));
 
-load('./ilsvrc_2012_mean.mat');
-model = '/media/zzs/SSD1TB/zzs/surgeried/VGG_ILSVRC_16_layers_deploy_pool5.prototxt';
-weights = '/media/zzs/SSD1TB/zzs/surgeried/surgery_weight';
-mean_pixel = mean(mean(mean_data, 1), 2);
-Caffe.gpu_id = 1;
+% load('./ilsvrc_2012_mean.mat');
+% model = '/media/zzs/SSD1TB/zzs/surgeried/VGG_ILSVRC_16_layers_deploy_pool5.prototxt';
+% weights = '/media/zzs/SSD1TB/zzs/surgeried/surgery_weight';
+% mean_pixel = mean(mean(mean_data, 1), 2);
+% Caffe.gpu_id = 1;
 
 
 %% set image pathes
-Dataset.img_dir = '/media/zzs/SSD1TB/zzs/dataset/PASCAL3D+_release1.1/Images/%s_imagenet/';
-Dataset.anno_dir = '/media/zzs/SSD1TB/zzs/dataset/PASCAL3D+_release1.1/Annotations/%s_imagenet/';
+Dataset.img_dir = '/export/home/qliu24/qing_voting_data/PASCAL3D+_release1.1/Images/%s_imagenet/';
+Dataset.anno_dir = '/export/home/qliu24/qing_voting_data/PASCAL3D+_release1.1/Annotations/%s_imagenet/';
 Data.gt_dir = './intermediate/ground_truth_data/';
 Dataset.train_list = fullfile(Data.gt_dir, ['%s_' sprintf('%s_train.txt', dataset_suffix)]);
 Dataset.test_list =  fullfile(Data.gt_dir, ['%s_' sprintf('%s_test.txt', dataset_suffix)]);
 dir_img = sprintf(Dataset.img_dir, category);
 
 Data.root_dir = './intermediate/data/';
-Data.root_dir2 = '/media/zzs/4TB/qingliu/qing_intermediate/';
+Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/';
 dir_feat_bbox_proposals = fullfile(Data.root_dir2, 'feat');
 
-Model.dir = '/media/zzs/4TB/qingliu/qing_intermediate/unary_weights/';
+Model.dir = fullfile(Data.root_dir2, 'unary_weights');
 vc_stat_file = fullfile(Model.dir, sprintf('%s_vc_stats.mat', model_category));
 
 % Model_file_bg = fullfile(Model.dir, 'all_train_bg2.mat');

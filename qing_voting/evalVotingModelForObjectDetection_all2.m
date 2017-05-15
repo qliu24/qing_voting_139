@@ -148,7 +148,7 @@ for n = 1: img_num_all
     boxes{n} = det_all_m{n}.box;
     
     % nms_list = nms([boxes{n}, scores{n}], Eval.nms_bbox_ratio);
-    nms_list = nms_list_all{n};
+    nms_list = nms_list_all2{n};
     boxes{n} = boxes{n}(nms_list, :);
     scores{n} = scores{n}(nms_list);
     

@@ -78,9 +78,9 @@ for i = 1: num_batch
         det{n}.score = zeros([num_box, 1]);
         for j = 1: num_box
             if strcmp(model_type, 'single')
-                det{n}.score(j, 1) = comptScores(feat{cnt_img}.r{j}, weight_obj, logZ);
+                det{n}.score(j, 1) = comptScores(feat{cnt_img}.r{j}<vc_magic_thrh, weight_obj, logZ);
             elseif strcmp(model_type, 'mix')
-                det{n}.score(j, 1) = comptScoresM(feat{cnt_img}.r{j}, weight_objs, logZs, log_priors);
+                det{n}.score(j, 1) = comptScoresM(feat{cnt_img}.r{j}<vc_magic_thrh, weight_objs, logZs, log_priors);
             else
                 error('Error: unknown model_type');
             end                

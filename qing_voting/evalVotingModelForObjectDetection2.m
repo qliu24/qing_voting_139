@@ -139,7 +139,7 @@ for n = 1: img_num
     % compute scores for proposal bounding boxes
     
     num_bbox = size(det_m{n}.score, 1);
-    scores{n} = score_rst{n}(:,obj_col(model_category));
+    scores{n} = score_rst2{n}(:,obj_col(model_category));
     boxes{n} = det_m{n}.box;
     
     nms_list = nms([boxes{n}, scores{n}], Eval.nms_bbox_ratio);
@@ -246,7 +246,7 @@ fprintf(' AP = %2.1f', 100 * ap);
 
 % save(file_perf_eval, 'fp', 'tp', 'rec', 'prec', 'ap', '-append');
 
-Eval.vis_prc = true;
+Eval.vis_prc = false;
 if Eval.vis_prc
     % plot precision/recall
     plot(rec, prec, '-');

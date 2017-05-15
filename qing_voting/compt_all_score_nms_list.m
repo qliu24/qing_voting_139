@@ -1,5 +1,5 @@
-Data.root_dir2 = '/media/zzs/4TB/qingliu/qing_intermediate/';
-dir_det_result = fullfile(Data.root_dir2, 'VC_file_round1/result');
+Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/';
+dir_det_result = fullfile(Data.root_dir2, 'result');
 dataset_suffix = 'mergelist_rand';
 layer_name = 'pool4';
 category = 'all';
