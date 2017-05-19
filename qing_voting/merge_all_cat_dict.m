@@ -26,7 +26,8 @@ for i = 1:numel(object)
     if length(img_set) >= 1000
         idx = randperm(length(img_set), 1000);
     else
-        idx = randi(length(img_set), 1, 1000);
+        idx = 1:length(img_set);
+        idx = [idx randperm(length(img_set), 1000-length(img_set))];
     end
     
     idx2 = arrayfun(@(x) (x-1)*samp_size+1:x*samp_size, idx, 'un',0);

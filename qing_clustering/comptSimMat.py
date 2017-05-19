@@ -5,9 +5,11 @@ from vcdist_funcs import *
 import time
 
 paral_num=8
-file_path = '/media/zzs/4TB/qingliu/qing_intermediate/feat_pickle/'
+# file_path = '/media/zzs/4TB/qingliu/qing_intermediate/feat_pickle/'
+# file_path = '/mnt/4T-HD/qing/voting_data/feat_pickle/'
+file_path = '/mnt/4T-HD/qing/intermediate/feat_pickle/'
 savename = file_path + 'all_simmat.pickle'
-magic_thh = 0.65
+magic_thh = 0.7
 
 layer_feature_dist = []
 sub_type = []
@@ -28,7 +30,7 @@ print('total number of instances {0}'.format(N))
 
 layer_feature_b = [None for nn in range(N)]
 for nn in range(N):
-    layer_feature_b[nn] = (layer_feature_dist[nn]<magic_thh).astype(int)
+    layer_feature_b[nn] = (layer_feature_dist[nn]<magic_thh).astype(int).T
     
 
 print('Start compute sim matrix...', flush=True)

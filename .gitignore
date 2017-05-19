@@ -1,1 +1,4 @@
 qing_voting/intermediate/
+.*
+!/.gitignore
+*~
