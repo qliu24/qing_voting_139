@@ -16,16 +16,16 @@ class FeatureExtractor:
         # Runtime params
         checkpoints_dir = os.path.join(cache_folder, 'checkpoints')
         with tf.device('/cpu:0'):
-            self.input_images = tf.placeholder(tf.float32, [self.batch_size, self.scale_size, self.scale_size, 3])
+            self.input_images = tf.placeholder(tf.float32, [self.batch_size, None, None, 3])
 
         with tf.variable_scope('vgg_16', reuse=False):
-            with slim.arg_scope(vgg.vgg_arg_scope(bn=True)):
+            with slim.arg_scope(vgg.vgg_arg_scope(bn=False)):
                 _, vgg_end_points = vgg.vgg_16(self.input_images, is_training=True)
                 
         self.features = vgg_end_points['vgg_16/' + which_layer]  # TODO
 
         # Create restorer and saver
-        restorer = self.get_init_restorer(bn=True)
+        restorer = self.get_init_restorer(bn=False)
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
 
@@ -39,10 +39,11 @@ class FeatureExtractor:
                 restorer.restore(self.sess, os.path.join(checkpoints_dir, 'vgg_16.ckpt'))
         else:  # Start from the last time
             restorer.restore(self.sess, os.path.join(checkpoints_dir, 'fine_tuned-' + str(which_snapshot)))
+        
         print(str(datetime.now()) + ': Finish Init')
         
         
-    def extract_feature_file(self, file_path):
+    def extract_feature_file(self, file_path, is_gray=False):
         if isinstance(file_path, (list, tuple)):
             assert(self.batch_size == len(file_path))
         else:
@@ -55,8 +56,10 @@ class FeatureExtractor:
             img = cv2.imread(file_path[ii])
             h, w, c = img.shape
             assert c == 3
-            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            img = cv2.cvtColor(gray,cv2.COLOR_GRAY2RGB)
+            if is_gray:
+                gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+                img = cv2.cvtColor(gray,cv2.COLOR_GRAY2RGB)
+                
             img = cv2.resize(img, (self.scale_size, self.scale_size))
             img = img.astype(np.float32)
             img -= self.img_mean
@@ -66,6 +69,25 @@ class FeatureExtractor:
         feed_dict = {self.input_images: batch_images}
         feature_list = self.sess.run(self.features, feed_dict=feed_dict)
         return feature_list
+    
+    
+    def extract_feature_image(self, img, is_gray=False):
+        assert(self.batch_size == 1)
+        h, w, c = img.shape
+        assert c == 3
+        if is_gray:
+            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+            img = cv2.cvtColor(gray,cv2.COLOR_GRAY2RGB)
+            
+        # img = cv2.resize(img, (self.scale_size, self.scale_size))
+        
+        img = img.astype(np.float32)
+        img -= self.img_mean
+            
+        feed_dict = {self.input_images: [img]}
+        out_features = self.sess.run(self.features, feed_dict=feed_dict)
+        return out_features
+    
     
     
     def get_init_restorer(self, bn=False, vc=False):
@@ -91,20 +113,6 @@ class FeatureExtractor:
         # variables_to_restore += [var for var in tf.global_variables() if 'vc_centers' in var.op.name]  # always restore VC
         return tf.train.Saver(variables_to_restore)
     
-    
-    def extract_feature_image(self, img):
-        assert(self.batch_size == 1)
-        h, w, c = img.shape
-        assert c == 3
-        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        img = cv2.cvtColor(gray,cv2.COLOR_GRAY2RGB)
-        img = cv2.resize(img, (self.scale_size, self.scale_size))
-        img = img.astype(np.float32)
-        img -= self.img_mean
-            
-        feed_dict = {self.input_images: [img]}
-        out_features = self.sess.run(self.features, feed_dict=feed_dict)
-        return out_features
     
     def close_sess(self):
         self.sess.close()

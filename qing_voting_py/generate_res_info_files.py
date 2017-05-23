@@ -23,20 +23,16 @@ def generate_res_info_files(category_ls, set_type):
         file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format(category, dataset_suffix, set_type))
         assert(os.path.isfile(file_cache_feat))
         with open(file_cache_feat, 'rb') as fh:
-            feat_set, r_set = pickle.load(fh)
-        
-        assert(os.path.isfile(Dictionary))
-        with open(Dictionary, 'rb') as fh:
-            _,centers = pickle.load(fh)
+            feat_set, r_set, r_super_set = pickle.load(fh)
             
-        assert(centers.shape[0]==VC['num'])
         
         layer_feature_dist = [None for nn in range(img_num)]
+        layer_feature_dist_super = [None for nn in range(img_num)]
         sub_type = [None for nn in range(img_num)]
         view_point = [None for nn in range(img_num)]
         for nn in range(img_num):
             layer_feature_dist[nn] = r_set[nn]
-            
+            layer_feature_dist_super[nn] = r_super_set[nn]
             file_anno = os.path.join(dir_anno, '{0}.mat'.format(img_list[nn][0]))
             assert(os.path.isfile(file_anno))
             mat_contents = sio.loadmat(file_anno)
@@ -54,4 +50,4 @@ def generate_res_info_files(category_ls, set_type):
         
         sfile = VC['res_info'].format(category,set_type)
         with open(sfile, 'wb') as fh:
-            pickle.dump([layer_feature_dist, sub_type, view_point], fh)
+            pickle.dump([layer_feature_dist, layer_feature_dist_super, sub_type, view_point], fh)

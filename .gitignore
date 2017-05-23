@@ -1,4 +1,6 @@
 qing_voting/intermediate/
+qing_voting_py/data/
+__*
 .*
 !/.gitignore
 *~

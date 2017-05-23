@@ -6,17 +6,18 @@ from FeatureExtractor import *
 from config_voting import *
 
 def comptVCData(category_ls, set_type):
+    assert(os.path.isfile(Dictionary))
+    with open(Dictionary, 'rb') as fh:
+        _,centers = pickle.load(fh)
+        
+    assert(centers.shape[0]==VC['num'])
+        
     for category in category_ls:
         file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format(category, dataset_suffix, set_type))
         assert(os.path.isfile(file_cache_feat))
         with open(file_cache_feat, 'rb') as fh:
             feat_set = pickle.load(fh)
-        
-        assert(os.path.isfile(Dictionary))
-        with open(Dictionary, 'rb') as fh:
-            _,centers = pickle.load(fh)
             
-        assert(centers.shape[0]==VC['num'])
         print('compute and cache VC distance data for {1} {0} set ...\n'.format(set_type, category))
         
         r_set = [None for nn in range(len(feat_set))]
