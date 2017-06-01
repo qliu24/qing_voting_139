@@ -1,7 +1,5 @@
-import cv2,os,glob,pickle,sys
-import numpy as np
-import tensorflow as tf
 from config_voting import *
+import tensorflow as tf
 from tensorflow.python.client import timeline
 from datetime import datetime
 import network as vgg
@@ -10,7 +8,7 @@ from FeatureExtractor import FeatureExtractor
 sys.path.insert(0, './')
 
 check_num = 1000  # save how many images to one file
-samp_size = 50  # number of features per image
+samp_size = 100  # number of features per image
 scale_size = 224
 
 # Specify the dataset
@@ -23,14 +21,14 @@ print('total images number : {0}'.format(img_num))
 
 extractor = FeatureExtractor(cache_folder=model_cache_folder, which_layer=VC['layer'], which_snapshot=0)
 
-step = int(0)
 res = np.zeros((featDim, 0))
 loc_set = np.zeros((5, 0))
 img_set = []
 
 for ii in range(img_num):
     img = cv2.imread(image_path[ii])
-    img = cv2.resize(img, (scale_size, scale_size))
+    # img = cv2.resize(img, (scale_size, scale_size))
+    img = myresize(img, scale_size, 'short')
     img_set.append(deepcopy(img))
     
     tmp = extractor.extract_feature_image(img)[0]
@@ -51,9 +49,9 @@ for ii in range(img_num):
         hi = Astride * (ihi + offset) - Apad
         wi = Astride * (iwi + offset) - Apad
         assert (hi >= 0)
-        assert (hi <= scale_size - Arf)
+        assert (hi <= img.shape[0] - Arf)
         assert (wi >= 0)
-        assert (wi <= scale_size - Arf)
+        assert (wi <= img.shape[1] - Arf)
         loc_set = np.column_stack((loc_set, [ii, hi, wi, hi+Arf, wi+Arf]))
     
     if (ii + 1) % check_num == 0 or ii == img_num - 1:
@@ -65,3 +63,7 @@ for ii in range(img_num):
         res = np.zeros((featDim, 0))
         loc_set = np.zeros((5, 0))
         img_set = []
+        
+    if ii%20==0:
+        print(ii, end=' ')
+        sys.stdout.flush()

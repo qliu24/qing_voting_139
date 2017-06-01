@@ -44,6 +44,7 @@ def generate_res_info_files(category_ls, set_type):
             
             if nn%100 == 0:
                 print(nn, end=' ')
+                sys.stdout.flush()
             
             
         print('\n')

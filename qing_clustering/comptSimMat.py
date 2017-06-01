@@ -1,15 +1,16 @@
 from joblib import Parallel, delayed
 import pickle
 import numpy as np
+import math
 from vcdist_funcs import *
 import time
 
-paral_num=8
+paral_num=6
 # file_path = '/media/zzs/4TB/qingliu/qing_intermediate/feat_pickle/'
 # file_path = '/mnt/4T-HD/qing/voting_data/feat_pickle/'
 file_path = '/mnt/4T-HD/qing/intermediate/feat_pickle/'
-savename = file_path + 'all_super_simmat.pickle'
-# magic_thh = 0.83
+savename = file_path + 'all_super_simmat_mthrh46_stride2.pickle'
+magic_thh = 0.046
 
 layer_feature_dist = []
 sub_type = []
@@ -28,14 +29,32 @@ N = len(sub_type)
 print('total number of instances {0}'.format(N))
 
 layer_feature_b = [None for nn in range(N)]
+stride = 2
 for nn in range(N):
     # layer_feature_b[nn] = (layer_feature_dist[nn]<magic_thh).astype(int).T
-    tmp = np.zeros_like(layer_feature_dist[nn]).astype('int')
-    for hh in range(tmp.shape[0]):
-        for ww in range(tmp.shape[1]):
-            tmp[hh,ww,np.argmin(tmp[hh,ww])] = 1
+    '''
+    ihh, iww, idd = layer_feature_dist[nn].shape
+    
+    tmp = np.zeros((math.ceil(ihh/stride), math.ceil(iww/stride), idd)).astype('int')
+    for hh in range(0,ihh,stride):
+        for ww in range(0,iww,stride):
+            d_min = np.unravel_index(np.argmin(layer_feature_dist[nn][hh:hh+stride,ww:ww+stride,:]), \
+                                 layer_feature_dist[nn][hh:hh+stride,ww:ww+stride,:].shape)
+            if np.min(layer_feature_dist[nn][hh:hh+stride,ww:ww+stride,:]) < magic_thh:
+                tmp[int(hh/stride),int(ww/stride),d_min[2]] = 1
             
     layer_feature_b[nn] = tmp.T
+    '''
+    ihh, iww, idd = layer_feature_dist[nn].shape
+    tmp = np.ones((math.ceil(ihh/stride), math.ceil(iww/stride), idd))
+    for dd in range(idd):
+        for hh in range(0,ihh,stride):
+            for ww in range(0,iww,stride):
+                min_dist = np.min(layer_feature_dist[nn][hh:hh+stride, ww:ww+stride, dd])
+                tmp[int(hh/stride),int(ww/stride),dd] = min_dist
+    
+    layer_feature_b[nn] = (tmp<magic_thh).astype(int).T
+    
 
 print('Start compute sim matrix...', flush=True)
 _s = time.time()

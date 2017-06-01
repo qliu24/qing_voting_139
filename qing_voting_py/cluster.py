@@ -1,7 +1,3 @@
-import cv2
-import numpy as np
-import pickle
-import time,math
 from sklearn.cluster import KMeans
 from config_voting import *
 

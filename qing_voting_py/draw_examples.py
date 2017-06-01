@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 
 fname='/mnt/4T-HD/qing/intermediate/feat/all_mergelist_rand_both_example.pickle'
+# fname='/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_pool4_K190_prune_512_example.pickle'
 with open(fname,'rb') as fh:
     example = pickle.load(fh)
 

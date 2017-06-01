@@ -9,13 +9,18 @@ def compt_weights(lbs, data):
     for kk in range(lbs.shape[0]):
         lb = lbs[kk]
         prob = np.sum(data * lb, axis=1)/np.sum(lb) + 1e-3
+        msk = prob>=1
+        prob[msk] = 1.0 - 1e-3
+            
         try:
             assert(np.all(prob>0))
             assert(np.all(prob<1))
         except:
-            print(np.sum(data * lb, axis=1)[0:10])
+            print(np.sum(data * lb, axis=1)[[5682, 5694]])
             print(np.sum(lb))
             print(prob[0:10])
+            print(kk)
+            print(np.where(prob>1))
             sys.exit('error in compt_weights')
             
         rst_w[kk] = np.log(prob/(1-prob))

@@ -1,6 +1,3 @@
-import numpy as np
-import math
-import pickle
 from scipy.spatial.distance import cdist
 from copy import *
 from FeatureExtractor import *
@@ -26,10 +23,11 @@ img_set = [None for nn in range(img_num)]
 r_set = [None for nn in range(img_num)]
 for nn in range(img_num):
     img = cv2.imread(image_path[nn])
-    img = cv2.resize(img, (scale_size, scale_size))
+    # img = cv2.resize(img, (scale_size, scale_size))
+    img = myresize(img, scale_size, 'short')
     img_set[nn] = deepcopy(img)
     layer_feature = extractor.extract_feature_image(img)[0]
-    feat_set[nn] = layer_feature
+    feat_set[nn] = deepcopy(layer_feature)
     
     height, width = layer_feature.shape[0:2]
     assert(featDim == layer_feature.shape[2])
@@ -43,8 +41,9 @@ for nn in range(img_num):
     r_set[nn] = dist
     
     
-    if nn%100 == 0:
+    if nn%50 == 0:
         print(nn, end=' ')
+        sys.stdout.flush()
         
 print('\n')
         

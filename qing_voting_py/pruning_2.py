@@ -1,9 +1,7 @@
-import pickle
-import numpy as np
 from config_voting import *
 
 cluster_num = featDim
-cluster_file = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_pool4_K189_prune_512.pickle'
+cluster_file = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_pool4_K190_prune_512.pickle'
 
 print('loading data...')
 
@@ -58,6 +56,6 @@ for k in range(K):
     if k%10 == 0:
         print(k)
         
-save_path = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_pool4_K189_prune_512_example.pickle'
+save_path = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_pool4_K190_prune_512_example.pickle'
 with open(save_path, 'wb') as fh:
     pickle.dump(example, fh)

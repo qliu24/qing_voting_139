@@ -5,7 +5,7 @@ from scipy.spatial.distance import cdist
 from FeatureExtractor import *
 from config_voting import *
 
-def extractLayerFeatSuperVC(category_ls, set_type):
+def extractLayerFeatSuperVC(category_ls, set_type, is_bg=False):
     assert(os.path.isfile(Dictionary_super))
     with open(Dictionary_super, 'rb') as fh:
         _,centers = pickle.load(fh)
@@ -15,6 +15,8 @@ def extractLayerFeatSuperVC(category_ls, set_type):
     
     for category in category_ls:
         file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format(category, dataset_suffix, set_type))
+        if is_bg:
+            file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_bg.pickle'.format(category, dataset_suffix, set_type))
         assert(os.path.isfile(file_cache_feat))
         with open(file_cache_feat, 'rb') as fh:
             feat_set, r_set = pickle.load(fh)

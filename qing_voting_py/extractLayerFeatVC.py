@@ -47,7 +47,8 @@ def extractLayerFeatVC(category_ls, set_type, scale_size=224):
             bbox = [max(math.ceil(bbox[0]), 1), max(math.ceil(bbox[1]), 1), \
                     min(math.floor(bbox[2]), width), min(math.floor(bbox[3]), height)]
             patch = img[bbox[1]-1: bbox[3], bbox[0]-1: bbox[2], :]
-            patch = cv2.resize(patch, (scale_size, scale_size))
+            # patch = cv2.resize(patch, (scale_size, scale_size))
+            patch = myresize(patch, scale_size, 'short')
             
             layer_feature = extractor.extract_feature_image(patch)[0]
             iheight, iwidth = layer_feature.shape[0:2]
@@ -64,6 +65,7 @@ def extractLayerFeatVC(category_ls, set_type, scale_size=224):
             
             if nn%100 == 0:
                 print(nn, end=' ')
+                sys.stdout.flush()
             
             
         print('\n')

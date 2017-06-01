@@ -1,5 +1,9 @@
-import os
+import cv2,os,glob,pickle,sys,math,time
 import numpy as np
+from myresize import myresize
+
+all_categories = ['car','aeroplane','bicycle','bus','motorbike','train']
+all_bgs = ['bg1','bg2','bg3','bg4','bg5','bg6']
 
 Apad_set = [2, 6, 18, 42, 90] # padding size
 Astride_set = [2, 4, 8, 16, 32] # stride size
@@ -14,6 +18,9 @@ Astride = Astride_set[pool4_n]
 featDim = featDim_set[pool4_n]
 Arf = Arf_set[pool4_n]
 offset = offset_set[pool4_n]
+
+scale_size = 224
+patch_size = [7,7]
 
 Dict = dict()
 Dict['file_list'] = '/home/candy/qing_voting_139/qing_voting_py/data/file_list.txt'
@@ -40,12 +47,16 @@ Feat['cache_dir'] = os.path.join(Data['root_dir2'], 'feat')
 if not os.path.exists(Feat['cache_dir']):
     os.makedirs(Feat['cache_dir'])
     
+Feat['cache_dir2'] = os.path.join(Data['root_dir2'], 'feat2')
+if not os.path.exists(Feat['cache_dir2']):
+    os.makedirs(Feat['cache_dir2'])
+    
 Feat['num_batch_img'] = 100
 Feat['max_num_props_per_img'] = 150
 
 
 VC = dict()
-VC['num'] = 189
+VC['num'] = 190
 VC['num_super'] = 80
 VC['layer'] = 'pool4'
 if not os.path.exists(os.path.join(Data['root_dir2'], 'feat_pickle')):
@@ -55,7 +66,10 @@ VC['res_info'] = os.path.join(Data['root_dir2'], 'feat_pickle', 'res_info_{0}_{1
 
 Dictionary = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_{0}_K{1}_prune_{2}.pickle'.format(VC['layer'], VC['num'], featDim)
 
-Dictionary_super = os.path.join(Feat['cache_dir'], 'dictionary_super_PASCAL3D+_VGG16_pool4_K80.pickle')
+Dictionary_super = os.path.join(Feat['cache_dir'], 'dictionary_super_PASCAL3D+_VGG16_{0}_K{1}.pickle'.format(VC['layer'], VC['num_super']))
+
+nms_thrh = 0.3
+Eval_ov_thrh = 0.5
 
 dir_det_result = os.path.join(Data['root_dir2'], 'result')
 if not os.path.exists(dir_det_result):
@@ -66,3 +80,35 @@ if not os.path.exists(dir_perf_eval):
     os.makedirs(dir_perf_eval)
     
 # file_det_result = os.path.join(dir_det_result, 'props_det_{0}_{1}_{2}_{3}_{4}'.format(model_category, category, dataset_suffix, set_type, model_suffix))
+
+Model_dir = os.path.join(Data['root_dir2'], 'unary_weights')
+
+model_file_dic = dict()
+for category in ['car','aeroplane','bicycle','bus','motorbike','train']:
+    model_file_dic[category] = os.path.join(Model_dir, '{0}_K4_softstart.pickle'.format(category))
+    
+model_file_dic['bg1'] = os.path.join(Model_dir, 'car_train_bg.pickle')
+model_file_dic['bg2'] = os.path.join(Model_dir, 'aeroplane_train_bg.pickle')
+model_file_dic['bg3'] = os.path.join(Model_dir, 'bicycle_train_bg.pickle')
+model_file_dic['bg4'] = os.path.join(Model_dir, 'bus_train_bg.pickle')
+model_file_dic['bg5'] = os.path.join(Model_dir, 'motorbike_train_bg.pickle')
+model_file_dic['bg6'] = os.path.join(Model_dir, 'train_train_bg.pickle')
+
+model_dim_dic = dict()
+model_dim_dic['car'] = [80, 24, 5]
+model_dim_dic['aeroplane'] = [80, 25, 8]
+model_dim_dic['bicycle'] = [80, 13, 12]
+model_dim_dic['bus'] = [80, 23, 9]
+model_dim_dic['motorbike'] = [80, 14, 15]
+model_dim_dic['train'] = [80, 25, 14]
+# model_dim_dic['car'] = [80, 48, 10]
+# model_dim_dic['aeroplane'] = [80, 49, 15]
+# model_dim_dic['bicycle'] = [80, 26, 23]
+# model_dim_dic['bus'] = [80, 45, 18]
+# model_dim_dic['motorbike'] = [80, 28, 30]
+# model_dim_dic['train'] = [80, 49, 28]
+
+SP = dict()
+SP['img_list'] = '/mnt/4T-HD/qing/intermediate_sp/dataset/test_list/{0}_test.txt'
+SP['anno_dir'] = '/mnt/4T-HD/qing/intermediate_sp/SP_final/{0}_imagenet/transfered'
+SP['feat_dir'] = '/mnt/4T-HD/qing/intermediate_sp/feat/'

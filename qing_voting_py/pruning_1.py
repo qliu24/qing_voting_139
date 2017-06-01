@@ -1,5 +1,3 @@
-import pickle
-import numpy as np
 from config_voting import *
 
 cluster_num = featDim

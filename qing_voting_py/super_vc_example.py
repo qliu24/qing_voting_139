@@ -6,24 +6,23 @@ from config_voting import *
 
 file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format('all', dataset_suffix, 'both'))
 with open(file_cache_feat, 'rb') as fh:
-    _,img_set,r_set = pickle.load(fh)
+    _,img_set,_ = pickle.load(fh)
 
-print('total number of instances {0}'.format(len(r_set)))
+print('total number of instances {0}'.format(len(img_set)))
 
-patch_feature_dist = []
-pos_rec = []
+
+fname = os.path.join(Feat['cache_dir'], 'dictionary_super_PASCAL3D+_VGG16_{0}_K{1}_tmp.pickle'.format(VC['layer'], VC['num_super']))
+with open(fname, 'rb') as fh:
+    patch_feature_dist, pos_rec = pickle.load(fh)
+
+
 patch_size = [7,7]  # h, w of patch
-for nn in range(len(r_set)):
-    h,w = r_set[nn].shape[0:2]
-    
-    for hh in range(0, h-patch_size[0]+1, 3):
-        for ww in range(0, w-patch_size[1]+1, 3):
-            patch_feature_dist.append(r_set[nn][hh:hh+patch_size[0], ww:ww+patch_size[1], :])
-            pos_rec.append([nn, hh, ww])
-            
+
 assert(os.path.isfile(Dictionary_super))
 with open(Dictionary_super, 'rb') as fh:
     assignment,centers = pickle.load(fh)
+    
+assert(VC['num_super'] == centers.shape[0])
         
 print('total number of vectors {0}'.format(len(patch_feature_dist)))
 
@@ -32,7 +31,7 @@ patch_feature_dist_f_norm = np.sqrt(np.sum(patch_feature_dist_f**2, 1)).reshape(
 patch_feature_dist_f = patch_feature_dist_f/patch_feature_dist_f_norm
 assert(patch_feature_dist_f.shape[1] == centers.shape[1])
 
-K = centers.shape[0]
+K = VC['num_super']
 example = [None for kk in range(K)]
 num = 50
 for kk in range(K):
@@ -55,6 +54,7 @@ for kk in range(K):
     example[kk] = np.copy(patch_set)
     if kk%10 == 0:
         print(kk)
+        sys.stdout.flush()
         
 save_path = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_example.pickle'.format('all', dataset_suffix, 'both'))
 with open(save_path, 'wb') as fh:
