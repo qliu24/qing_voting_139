@@ -38,6 +38,7 @@ for nn in range(img_num):
     assert(score_rst[nn].shape[0] == boxes.shape[0])
     score_highest = np.max(score_rst[nn],axis=1)
     # adhoc thing
+    '''
     si = np.argsort(-score_highest)
     height, width = det[nn]['img_siz']
     topn = 5
@@ -50,10 +51,11 @@ for nn in range(img_num):
         
     biggest_i = np.argmax(bbox_area)
     score_highest[si[biggest_i]] += 100
-    
+    '''
     
     score_highest2 = np.max(score_rst2[nn],axis=1)
     # adhoc thing
+    '''
     si = np.argsort(-score_highest2)
     bbox_area = np.zeros(topn)
     for mm in range(topn):
@@ -64,10 +66,10 @@ for nn in range(img_num):
         
     biggest_i = np.argmax(bbox_area)
     score_highest2[si[biggest_i]] += 100
-    
+    '''
     num_list_all[nn] = nms(np.column_stack([boxes, score_highest]), nms_thrh)
     num_list_all2[nn] = nms(np.column_stack([boxes, score_highest2]), nms_thrh)
-
+    
 
 for dd in det:
     del dd['score']

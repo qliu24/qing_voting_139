@@ -72,8 +72,8 @@ def evalVotingModelForObjDet(model_category, category, set_type = 'test'):
         s_i = score_rst2[nn][:,all_categories.index(model_category)]
         b_i = det[nn]['box']
         
-        # nms_list = nms(np.column_stack([b_i, s_i]), nms_thrh)
-        nms_list = nms_list_all2[nn]
+        nms_list = nms(np.column_stack([b_i, s_i]), nms_thrh)
+        # nms_list = nms_list_all2[nn]
         boxes = np.column_stack([boxes, b_i[nms_list, :].T])
         scores = np.append(scores, s_i[nms_list])
         

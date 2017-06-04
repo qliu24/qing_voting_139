@@ -2,11 +2,11 @@ from sklearn.cluster import KMeans
 from config_voting import *
 
 cluster_num = featDim
-save_path = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_{0}_K{1}.pickle'.format(VC['layer'], cluster_num)
+save_path = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_{0}_K{1}.pickle'.format(VC['layer'], cluster_num)
 
 
 # number of files to read in
-file_num = 6
+file_num = 1
 feat_set = np.zeros((featDim, 0))
 for ii in range(file_num):
     print('loading file {0}/{1}'.format(ii+1, file_num))
@@ -25,7 +25,7 @@ feat_set = feat_set/feat_norm
 
 print('Start K-means...')
 _s = time.time()
-km = KMeans(n_clusters=cluster_num, init='k-means++', random_state=99, n_jobs=-5)
+km = KMeans(n_clusters=cluster_num, init='k-means++', random_state=99, n_jobs=1)
 assignment = km.fit_predict(feat_set.T)
 centers = km.cluster_centers_
 _e = time.time()

@@ -9,11 +9,12 @@ assert(os.path.isfile(Dict['file_list']))
 with open(Dict['file_list'], 'r') as fh:
     image_path = [ff.strip() for ff in fh.readlines()]
     
-img_num = len(image_path)
+# img_num = len(image_path)
+img_num=1000
 print('total images number : {0}'.format(img_num))
 
-assert(os.path.isfile(Dictionary))
-with open(Dictionary, 'rb') as fh:
+assert(os.path.isfile(Dictionary_car))
+with open(Dictionary_car, 'rb') as fh:
     _,centers = pickle.load(fh)
 
 extractor = FeatureExtractor(cache_folder=model_cache_folder, which_layer=VC['layer'], which_snapshot=0)
@@ -47,7 +48,7 @@ for nn in range(img_num):
         
 print('\n')
         
-file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format('all', dataset_suffix, 'both'))
+file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format('car', dataset_suffix, 'both'))
 with open(file_cache_feat, 'wb') as fh:
     pickle.dump([feat_set,img_set,r_set], fh)
 

@@ -57,6 +57,7 @@ Feat['max_num_props_per_img'] = 150
 
 VC = dict()
 VC['num'] = 190
+VC['num_car'] = 158
 VC['num_super'] = 80
 VC['layer'] = 'pool4'
 if not os.path.exists(os.path.join(Data['root_dir2'], 'feat_pickle')):
@@ -66,10 +67,17 @@ VC['res_info'] = os.path.join(Data['root_dir2'], 'feat_pickle', 'res_info_{0}_{1
 
 Dictionary = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_{0}_K{1}_prune_{2}.pickle'.format(VC['layer'], VC['num'], featDim)
 
+Dictionary_car = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_{0}_K{1}_prune_{2}.pickle'.format(VC['layer'], VC['num_car'], featDim)
+
 Dictionary_super = os.path.join(Feat['cache_dir'], 'dictionary_super_PASCAL3D+_VGG16_{0}_K{1}.pickle'.format(VC['layer'], VC['num_super']))
+
+Dictionary_super_car = os.path.join(Feat['cache_dir'], 'dictionary_super_PASCAL3D+_car_VGG16_{0}_K{1}.pickle'.format(VC['layer'], VC['num_super']))
 
 nms_thrh = 0.3
 Eval_ov_thrh = 0.5
+Eval = dict()
+Eval['dist_thresh'] = 56
+Eval['iou_thresh'] = 0.5
 
 dir_det_result = os.path.join(Data['root_dir2'], 'result')
 if not os.path.exists(dir_det_result):
@@ -112,3 +120,4 @@ SP = dict()
 SP['img_list'] = '/mnt/4T-HD/qing/intermediate_sp/dataset/test_list/{0}_test.txt'
 SP['anno_dir'] = '/mnt/4T-HD/qing/intermediate_sp/SP_final/{0}_imagenet/transfered'
 SP['feat_dir'] = '/mnt/4T-HD/qing/intermediate_sp/feat/'
+SP['result'] = '/mnt/4T-HD/qing/intermediate_sp/result/'
