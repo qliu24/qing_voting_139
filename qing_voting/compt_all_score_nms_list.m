@@ -1,4 +1,4 @@
-Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/';
+Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/VC_file_round2';
 dir_det_result = fullfile(Data.root_dir2, 'result');
 dataset_suffix = 'mergelist_rand';
 layer_name = 'pool4';
@@ -94,7 +94,7 @@ for n = 1: img_num_all
 %     end
 %     [~, biggest_i] = max(bbox_area);
 %     score_highest(si(biggest_i)) = score_highest(si(biggest_i))+100;
-%     
+    
     nms_list_all{n} = nms([boxes{n}, score_highest], 0.3);
     
     if mod(n, 50) == 0
@@ -109,6 +109,20 @@ for n = 1: img_num_all
     
     % do NMS
     score_highest = max(score_rst2{n}, [], 2);
+    % ad hoc thing
+%     [~, si] = sort(-score_highest);
+%     height = det_all{n}.img_siz(1);
+%     width = det_all{n}.img_siz(2);
+%     topn=5;
+%     bbox_area = zeros(topn,1);
+%     for mm = 1:topn
+%         bbmm = boxes{n}(si(mm), :);
+%         bbmm = [max(ceil(bbmm(1)), 1), max(ceil(bbmm(2)), 1), min(floor(bbmm(3)), width), min(floor(bbmm(4)), height)];
+%         bbox_area(mm) = (bbmm(3)-bbmm(1))*(bbmm(4)-bbmm(2));
+%     end
+%     [~, biggest_i] = max(bbox_area);
+%     score_highest(si(biggest_i)) = score_highest(si(biggest_i))+100;
+    
     nms_list_all2{n} = nms([boxes{n}, score_highest], 0.3);
     
     if mod(n, 50) == 0

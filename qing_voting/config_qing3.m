@@ -2,7 +2,7 @@ global category model_category Eval;
 dataset_suffix = 'mergelist_rand';
 layer_name = 'pool4';
 % category = 'all';
-% model_category = 'bicycle';
+% model_category = 'motorbike';
 set_type = 'test';
 
 model_type = 'mix'; % or single
@@ -59,7 +59,7 @@ Dataset.test_list =  fullfile(Data.gt_dir, ['%s_' sprintf('%s_test.txt', dataset
 dir_img = sprintf(Dataset.img_dir, category);
 
 Data.root_dir = './intermediate/data/';
-Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/';
+Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/VC_file_round2';
 dir_feat_bbox_proposals = fullfile(Data.root_dir2, 'feat');
 
 Model.dir = fullfile(Data.root_dir2, 'unary_weights');

@@ -5,11 +5,11 @@ layer_name = 'pool4';
 % model_category = 'motorbike';
 set_type = 'test';
 
-model_type = 'single'; % or single
+model_type = 'mix'; % or single
 model_suffix = sprintf('%s.mat', model_type);
 
 Eval.nms_bbox_ratio = 0.3;
-vc_magic_thrh = 0.67;
+vc_magic_thrh = 0.7;
 %% feature parameter
 caffe_dim = 224; % caffe input dimension in deploy protobuf
 layer_set = {'pool1', 'pool2', 'pool3', 'pool4', 'pool5'};
@@ -60,7 +60,7 @@ Dataset.test_list =  fullfile(Data.gt_dir, ['%s_' sprintf('%s_test.txt', dataset
 dir_img = sprintf(Dataset.img_dir, category);
 
 Data.root_dir = './intermediate/data/';
-Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/';
+Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/VC_file_round2/';
 dir_feat_bbox_proposals = fullfile(Data.root_dir2, 'feat');
 
 Model.dir = fullfile(Data.root_dir2, 'unary_weights');

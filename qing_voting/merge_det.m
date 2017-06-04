@@ -1,6 +1,6 @@
 global model_category;
 % Data.root_dir2 = '/media/zzs/4TB/qingliu/qing_intermediate/';
-Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/';
+Data.root_dir2 = '/export/home/qliu24/qing_voting_data/qing_intermediate/VC_file_round2';
 dir_det_result = fullfile(Data.root_dir2, 'result');
 model_type = 'mix';
 model_suffix = sprintf('%s.mat', model_type);
