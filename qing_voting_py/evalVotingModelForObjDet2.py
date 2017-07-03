@@ -92,7 +92,7 @@ def evalVotingModelForObjDet2(model_category, category, set_type = 'test'):
         b_i = det[nn]['box']
         
         # adhoc thing
-        '''
+        
         si = np.argsort(-s_i)
         hhi, wwi = det[nn]['img_siz']
         topn = 3
@@ -105,7 +105,7 @@ def evalVotingModelForObjDet2(model_category, category, set_type = 'test'):
             
         biggest_i = np.argmax(bbox_area)
         s_i[si[biggest_i]] += 60
-        '''
+        
         nms_list = nms(np.column_stack([b_i, s_i]), nms_thrh)
         # nms_list = nms_list_all2[nn]
         boxes = np.column_stack([boxes, b_i[nms_list, :].T])

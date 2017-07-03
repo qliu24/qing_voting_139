@@ -251,7 +251,7 @@ with open(fname, 'rb') as fh:
     lbs = pickle.load(fh)
 
 K=4
-save_name = file_path2+'VCpart_model_{0}_K{1}_term3_blur_coef.pickle'.format(oo, K)
+save_name = file_path2+'VCpart_model_{0}_K{1}_term3_noblur_coef.pickle'.format(oo, K)
 
 hm_ls = []
 vcpartp_ls = []
@@ -324,7 +324,7 @@ for kk in range(K):
     layer_fired_pos = get_fired_pos_vct(layer_feature_dist_kk, layer_feature_b, gm_ls, vc_templates, vc_part_cnt, max_0, max_1, max_2)
     
     for itt in range(15):
-        heat_map = get_heatmap(layer_fired_pos, max_0, max_1, max_2, blur=0.25, pctl = None, thrh = None)
+        heat_map = get_heatmap(layer_fired_pos, max_0, max_1, max_2, blur=None, pctl = None, thrh = None)
         vc_part_p = [[np.sum([not(layer_fired_pos[nn][vc_i][hmnn] is None) for nn in range(N)])/N for hmnn in range(vc_part_cnt[vc_i])]for vc_i in range(max_2)]
         sc, sc_d = get_score(layer_feature_dist_kk, layer_fired_pos, heat_map, vc_templates, vc_part_cnt, vc_part_p)
         print(sc, sc_d)
