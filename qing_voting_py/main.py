@@ -6,4 +6,4 @@ from evalVotingModelForObjDet import evalVotingModelForObjDet
 exec(open("./compt_all_score_nms_list.py").read())
 for oo in all_categories:
     print(oo)
-    evalVotingModelForObjDet(oo,oo)
+    evalVotingModelForObjDet(oo,'all')

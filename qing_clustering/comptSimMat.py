@@ -5,27 +5,25 @@ import math
 from vcdist_funcs import *
 import time
 
-paral_num=6
+paral_num=20
 # file_path = '/media/zzs/4TB/qingliu/qing_intermediate/feat_pickle/'
 # file_path = '/mnt/4T-HD/qing/voting_data/feat_pickle/'
-file_path = '/mnt/4T-HD/qing/intermediate/feat_pickle/'
-savename = file_path + 'all_super_simmat_mthrh48_stride1.pickle'
-magic_thh = 0.048
+file_path = '/export/home/qliu24/qing_voting_data/intermediate/feat_pickle_alex/'
+savename = file_path + 'all_simmat_mthrh048.pickle'
+magic_thh = 0.48
 
 layer_feature_dist = []
-sub_type = []
-view_point = []
 objects = ['car', 'aeroplane', 'bicycle', 'bus', 'motorbike', 'train']
+# objects = ['car']
 for oo in objects:
-    fname = file_path + 'res_info_' + oo + '_train.pickle'
+    fname = file_path + 'res_info_' + oo + '_train_gray200.pickle'
     print('loading object {0}'.format(oo))
     with open(fname, 'rb') as fh:
-        _, l, s, v = pickle.load(fh)
+        l, _, _ = pickle.load(fh)
         layer_feature_dist += l
-        sub_type += s
-        view_point += v
         
-N = len(sub_type)
+        
+N = len(layer_feature_dist)
 print('total number of instances {0}'.format(N))
 
 layer_feature_b = [None for nn in range(N)]

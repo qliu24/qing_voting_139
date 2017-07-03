@@ -2,11 +2,11 @@ from config_voting import *
 import scipy.io as sio
 
 # objs = ['car','aeroplane','bicycle','bus','motorbike','train']
-objs = ['motorbike','train']
+objs = ['car']
 set_type = 'test'
 
 for category in objs:
-    file_gt_obj_anno = os.path.join(dir_perf_eval, 'gt_anno_{0}_{1}_{2}.pickle'.format(category, dataset_suffix, set_type))
+    file_gt_obj_anno = os.path.join(dir_perf_eval, 'gt_anno_{0}_{1}_{2}_100.pickle'.format(category, dataset_suffix, set_type))
     
     n_pos = 0
     dir_img = Dataset['img_dir'].format(category)
@@ -20,6 +20,7 @@ for category in objs:
         
     img_list = [x.strip().split() for x in content]
     img_num = len(img_list)
+    img_num = 100
     print('total number of images for {1}: {0}'.format(img_num, category))
     gt = [dict() for nn in range(img_num)]
     

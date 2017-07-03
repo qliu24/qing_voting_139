@@ -4,15 +4,14 @@ from FeatureExtractor import *
 from config_voting import *
 
 def comptFeatForBBoxes(category_ls, set_type='test'):
-    extractor = FeatureExtractor(cache_folder=model_cache_folder, which_layer=VC['layer'], which_snapshot=0)
+    extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='vgg16', which_layer=VC['layer'], which_snapshot=0)
     
-    '''
-    assert(os.path.isfile(Dictionary))
-    with open(Dictionary, 'rb') as fh:
+    assert(os.path.isfile(Dictionary_car))
+    with open(Dictionary_car, 'rb') as fh:
         _,centers = pickle.load(fh)
         
-    assert(centers.shape[0]==VC['num'])
-    
+    assert(centers.shape[0]==VC['num_car'])
+    '''
     assert(os.path.isfile(Dictionary_super))
     with open(Dictionary_super, 'rb') as fh:
         _,centers_super = pickle.load(fh)
@@ -48,7 +47,7 @@ def comptFeatForBBoxes(category_ls, set_type='test'):
         
         for ii in range(num_batch):
             file_nm='props_feat_{0}_{1}_{2}_{3}.pickle'.format(category, dataset_suffix, set_type, ii)
-            file_cache_feat_batch = os.path.join(Feat['cache_dir2'], file_nm)
+            file_cache_feat_batch = os.path.join(Feat['cache_dir'], file_nm)
             img_start_id = Feat['num_batch_img']*ii
             img_end_id = min(Feat['num_batch_img']*(ii+1), img_num)
             
@@ -62,7 +61,7 @@ def comptFeatForBBoxes(category_ls, set_type='test'):
                 assert(os.path.isfile(file_img))
                 img = cv2.imread(file_img)
                 # weird rotated image
-                if file_img=='/mnt/4T-HD/qing/PASCAL3D+_release1.1/Images/motorbike_imagenet/n03790512_7145.JPEG':
+                if file_img=='/export/home/qliu24/dataset/PASCAL3D+_release1.1/Images/motorbike_imagenet/n03790512_7145.JPEG':
                     img = img.transpose(1,0,2)[:,::-1,:]
                     
                 height, width, _ = img.shape
@@ -82,7 +81,7 @@ def comptFeatForBBoxes(category_ls, set_type='test'):
                 feat[cnt_img]['img_siz'] = [height, width]
                 feat[cnt_img]['box'] = boxes[:,0:4]
                 feat[cnt_img]['feat'] = [None for jj in range(num_box)]
-                # feat[cnt_img]['r'] = [None for jj in range(num_box)]
+                feat[cnt_img]['r'] = [None for jj in range(num_box)]
                 # feat[cnt_img]['r_super'] = [None for jj in range(num_box)]
                 
                 for jj in range(num_box):
@@ -95,7 +94,7 @@ def comptFeatForBBoxes(category_ls, set_type='test'):
                     layer_feature = extractor.extract_feature_image(patch)[0]
                     feat[cnt_img]['feat'][jj] = layer_feature
                     
-                    '''
+                    
                     iheight, iwidth = layer_feature.shape[0:2]
                     assert(featDim == layer_feature.shape[2])
                     layer_feature = layer_feature.reshape(-1, featDim)
@@ -107,7 +106,7 @@ def comptFeatForBBoxes(category_ls, set_type='test'):
                     
                     feat[cnt_img]['r'][jj] = dist
                     
-                    
+                    '''
                     super_f = np.zeros((iheight-patch_size[0]+1, iwidth-patch_size[1]+1, patch_size[0]*patch_size[1]*VC['num']))
                     for hh in range(0, iheight-patch_size[0]+1):
                         for ww in range(0, iwidth-patch_size[1]+1):
@@ -130,5 +129,11 @@ def comptFeatForBBoxes(category_ls, set_type='test'):
             print('\n', end='')
             with open(file_cache_feat_batch, 'wb') as fh:
                 pickle.dump(feat, fh)
+                
+
+if __name__=="__main__":
+    objs = ['motorbike','train']
+    comptFeatForBBoxes(objs, 'test')
+    
 
 

@@ -1,14 +1,14 @@
 from config_voting import *
 
-cluster_num = featDim
-cluster_file = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_{0}_K{1}.pickle'.format(VC['layer'], cluster_num)
-save_path1 = '/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_{0}_K'.format(VC['layer'])
+cluster_num = 512
+cluster_file = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_ALEX_{0}_K{1}.pickle'.format(VC['layer'], cluster_num)
+save_path1 = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_ALEX_{0}_K'.format(VC['layer'])
 save_path2 = '_prune_{0}.pickle'.format(cluster_num)
 
 print('loading data...')
 
 # number of files to read in
-file_num = 1
+file_num = 6
 feat_set = np.zeros((featDim, 0))
 for ii in range(file_num):
     print('loading file {0}/{1}'.format(ii+1, file_num))

@@ -59,9 +59,9 @@ def testVotingForBBoxes(model_category_ls, category_ls, set_type='test', model_t
                     
                     for jj in range(num_box):
                         if model_type=='single':
-                            det[nn]['score'][jj] = comptScores(feat[cnt_img]['r_super'][jj], weight_obj, logZ)
+                            det[nn]['score'][jj] = comptScores(feat[cnt_img]['r'][jj], weight_obj, logZ)
                         elif model_type=='mix':
-                            det[nn]['score'][jj] = comptScoresM(feat[cnt_img]['r_super'][jj], weight_objs, logZs, log_priors)
+                            det[nn]['score'][jj] = comptScoresM(feat[cnt_img]['r'][jj], weight_objs, logZs, log_priors)
                         else:
                             sys.exit('Error: unknown model type')
                             

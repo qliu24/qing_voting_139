@@ -19,20 +19,21 @@ def generate_res_info_files(category_ls, set_type):
         img_num = len(img_list)
         print('total number of images for {1}: {0}'.format(img_num, category))
         
-        
-        file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format(category, dataset_suffix, set_type))
+        FCD_tmp = '/export/home/qliu24/qing_voting_data/intermediate/feat_alex'
+        # file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_gray200.pickle'.format(category, dataset_suffix, set_type))
+        file_cache_feat = os.path.join(FCD_tmp, '{0}_{1}_{2}_gray200.pickle'.format(category, dataset_suffix, set_type))
         assert(os.path.isfile(file_cache_feat))
         with open(file_cache_feat, 'rb') as fh:
-            feat_set, r_set, r_super_set = pickle.load(fh)
+            feat_set, r_set = pickle.load(fh)
             
         
         layer_feature_dist = [None for nn in range(img_num)]
-        layer_feature_dist_super = [None for nn in range(img_num)]
+        # layer_feature_dist_super = [None for nn in range(img_num)]
         sub_type = [None for nn in range(img_num)]
         view_point = [None for nn in range(img_num)]
         for nn in range(img_num):
             layer_feature_dist[nn] = r_set[nn]
-            layer_feature_dist_super[nn] = r_super_set[nn]
+            # layer_feature_dist_super[nn] = r_super_set[nn]
             file_anno = os.path.join(dir_anno, '{0}.mat'.format(img_list[nn][0]))
             assert(os.path.isfile(file_anno))
             mat_contents = sio.loadmat(file_anno)
@@ -40,7 +41,8 @@ def generate_res_info_files(category_ls, set_type):
             objects = record['objects']
             
             sub_type[nn] = objects[0,0]['subtype'][0,int(img_list[nn][1])-1][0]
-            view_point[nn] = objects[0,0]['viewpoint'][0,int(img_list[nn][1])-1]['azimuth_coarse'][0,0][0,0]
+            view_point[nn] = (objects[0,0]['viewpoint'][0,int(img_list[nn][1])-1]['azimuth_coarse'][0,0][0,0], \
+                              objects[0,0]['viewpoint'][0,int(img_list[nn][1])-1]['elevation_coarse'][0,0][0,0])
             
             if nn%100 == 0:
                 print(nn, end=' ')
@@ -49,6 +51,11 @@ def generate_res_info_files(category_ls, set_type):
             
         print('\n')
         
-        sfile = VC['res_info'].format(category,set_type)
+        sfile = VC['res_info'].format(category,set_type+'_gray200')
         with open(sfile, 'wb') as fh:
-            pickle.dump([layer_feature_dist, layer_feature_dist_super, sub_type, view_point], fh)
+            pickle.dump([layer_feature_dist, sub_type, view_point], fh)
+            
+if __name__=='__main__':
+    objs = ['car','aeroplane','bicycle','bus','motorbike','train']
+    # objs = ['car']
+    generate_res_info_files(objs, 'train')

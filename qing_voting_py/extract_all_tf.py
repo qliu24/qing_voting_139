@@ -2,7 +2,6 @@ from config_voting import *
 import tensorflow as tf
 from tensorflow.python.client import timeline
 from datetime import datetime
-import network as vgg
 from copy import *
 from FeatureExtractor import FeatureExtractor
 sys.path.insert(0, './')
@@ -19,7 +18,7 @@ with open(Dict['file_list'], 'r') as fh:
 img_num = len(image_path)
 print('total images number : {0}'.format(img_num))
 
-extractor = FeatureExtractor(cache_folder=model_cache_folder, which_layer=VC['layer'], which_snapshot=0)
+extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='alexnet', which_layer=VC['layer'], which_snapshot=93000)
 
 res = np.zeros((featDim, 0))
 loc_set = np.zeros((5, 0))
@@ -31,7 +30,7 @@ for ii in range(img_num):
     img = myresize(img, scale_size, 'short')
     img_set.append(deepcopy(img))
     
-    tmp = extractor.extract_feature_image(img)[0]
+    tmp = extractor.extract_feature_image(img, is_gray=True)[0]
     assert(tmp.shape[2]==featDim)
     height, width = tmp.shape[0:2]
     tmp = tmp[offset:height - offset, offset:width - offset, :]
@@ -56,7 +55,7 @@ for ii in range(img_num):
     
     if (ii + 1) % check_num == 0 or ii == img_num - 1:
         print('saving batch {0}/{1}'.format(ii//check_num+1, math.ceil(img_num/check_num)))
-        fnm = Dict['cache_path']+str(ii//check_num)+'.pickle'
+        fnm = Dict['cache_path']+str(ii//check_num)+'_gray.pickle'
         with open(fnm, 'wb') as fh:
             pickle.dump([res, loc_set, img_set], fh)
         

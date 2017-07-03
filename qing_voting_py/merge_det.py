@@ -1,11 +1,11 @@
 from config_voting import *
 def merge_det(list1, list2):
     for model_category in list1:
-        save_file = os.path.join(dir_det_result, 'props_det_{0}_{1}.pickle'.format(model_category, 'all'))
+        save_file = os.path.join(dir_det_result, 'props_det_{0}_{1}.pickle'.format(model_category, 'carbus'))
         det = []
         
         for category in list2:
-            file_det_result = os.path.join(dir_det_result, 'props_det_{0}_{1}.pickle'.format(model_category, category))
+            file_det_result = os.path.join(dir_det_result, 'props_det_{0}_{1}_pctl33.pickle'.format(model_category, category))
             assert(os.path.isfile(file_det_result))
             with open(file_det_result, 'rb') as fh:
                 det_i = pickle.load(fh)
@@ -17,3 +17,7 @@ def merge_det(list1, list2):
             
         with open(save_file, 'wb') as fh:
             pickle.dump(det, fh)
+            
+            
+if __name__=="__main__":
+    merge_det(['car'],['car','bus'])

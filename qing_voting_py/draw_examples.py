@@ -2,8 +2,8 @@ import pickle
 import numpy as np
 import cv2
 
-fname='/mnt/4T-HD/qing/intermediate/feat/all_mergelist_rand_both_example.pickle'
-# fname='/home/candy/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_VGG16_pool4_K190_prune_512_example.pickle'
+# fname='/mnt/4T-HD/qing/intermediate/feat/all_mergelist_rand_both_example.pickle'
+fname='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_ALEX_conv3_K200_gray_example.pickle'
 with open(fname,'rb') as fh:
     example = pickle.load(fh)
 
@@ -19,7 +19,7 @@ for ii in range(len(example)):
         bb = iis%5
         rnum = 10+aa*(100+10)
         cnum = 10+bb*(100+10)
-        big_img[rnum:rnum+100, cnum:cnum+100, :] = example[ii][:,iis].reshape(100,100,3).astype(int)
+        big_img[rnum:rnum+99, cnum:cnum+99, :] = example[ii][:,iis].reshape(99,99,3).astype(int)
 
-    fname = '/home/candy/qing_voting_139/qing_voting_py/data/examples_K80_super/example_K' + str(ii) + '.png'
+    fname = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/examples_K200_gray_alex_nocat/example_K' + str(ii) + '.png'
     cv2.imwrite(fname, big_img)

@@ -7,7 +7,7 @@ from FeatureExtractor import *
 from config_voting import *
 
 def extractLayerFeatVC(category_ls, set_type, scale_size=224):
-    extractor = FeatureExtractor(cache_folder=model_cache_folder, which_layer=VC['layer'], which_snapshot=0)
+    extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='alexnet', which_layer=VC['layer'], which_snapshot=93000)
     
     assert(os.path.isfile(Dictionary))
     with open(Dictionary, 'rb') as fh:
@@ -50,7 +50,7 @@ def extractLayerFeatVC(category_ls, set_type, scale_size=224):
             # patch = cv2.resize(patch, (scale_size, scale_size))
             patch = myresize(patch, scale_size, 'short')
             
-            layer_feature = extractor.extract_feature_image(patch)[0]
+            layer_feature = extractor.extract_feature_image(patch, is_gray=True)[0]
             iheight, iwidth = layer_feature.shape[0:2]
             assert(featDim == layer_feature.shape[2])
             feat_set[nn] = layer_feature
@@ -70,7 +70,12 @@ def extractLayerFeatVC(category_ls, set_type, scale_size=224):
             
         print('\n')
         
-        file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}.pickle'.format(category, dataset_suffix, set_type))
+        file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_gray200.pickle'.format(category, dataset_suffix, set_type))
         with open(file_cache_feat, 'wb') as fh:
             pickle.dump([feat_set, r_set], fh)
-
+            
+            
+if __name__=='__main__':
+    objs = ['car','aeroplane','bicycle','bus','motorbike','train']
+    # objs = ['car']
+    extractLayerFeatVC(objs, 'train')
