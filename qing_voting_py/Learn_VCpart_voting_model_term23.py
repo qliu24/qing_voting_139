@@ -154,7 +154,7 @@ def init_heatmap(vc_p, max_0, max_1, blur=0.5, pctl = None, thrh = None):
     elif not (pctl is None):
         thrh = np.percentile(hm[hm>0], pctl)
         
-    hm[hm<=thrh]=0
+    hm[hm<thrh]=0
     hm /= np.sum(hm)
     return hm
 
@@ -254,7 +254,7 @@ with open(fname, 'rb') as fh:
     lbs = pickle.load(fh)
 
 K=4
-save_name = file_path2+'VCpart_model_{0}_K{1}_term23_org.pickle'.format(oo, K)
+save_name = file_path2+'VCpart_model_{0}_K{1}_term23_org1.pickle'.format(oo, K)
 
 hm_ls = []
 vcpartp_ls = []
@@ -307,7 +307,7 @@ for kk in range(K):
         gm, assignment = gm_vc_pos(vc_p, K)
         while True:
             p_dist = pdist(gm.means_)
-            if np.any(gm.weights_<0.5/K) or np.any(p_dist<7):
+            if np.any(gm.weights_<0.5/K) or np.any(p_dist<9):
                 K -= 1
                 if K==1:
                     gm = None
@@ -317,7 +317,7 @@ for kk in range(K):
                     gm, assignment = gm_vc_pos(vc_p, K)
             else:
                 break
-
+                
         # print('final K: {0}'.format(K), flush='True')
         for kk in range(K):
             heat_map_init[vc_i].append(init_heatmap(vc_p[assignment==kk], max_0, max_1, blur=None, pctl = 10))
@@ -330,11 +330,12 @@ for kk in range(K):
     vc_part_p = [[np.sum([not(layer_fired_pos[nn][vc_i][hmnn] is None) for nn in range(N)])/N for hmnn in range(vc_part_cnt[vc_i])] for vc_i in range(max_2)]
     
     vc_templates = get_vctplt(layer_fired_pos, layer_feature_dist_kk, vc_part_cnt, max_0, max_1, max_2)
-    # layer_fired_pos = get_fired_pos_vct(layer_feature_dist_kk, layer_feature_b, gm_ls, vc_templates, vc_part_cnt, max_0, max_1, max_2)
-    layer_fired_pos = get_fired_pos(layer_feature_dist_kk, layer_feature_b, heat_map_init, vc_part_cnt, vc_part_p, vc_templates)
+    # vc_templates = [[np.ones((7,7))*1.3 for hmnn in range(vc_part_cnt[vc_i])] for vc_i in range(max_2)]
+    layer_fired_pos = get_fired_pos_vct(layer_feature_dist_kk, layer_feature_b, gm_ls, vc_templates, vc_part_cnt, max_0, max_1, max_2)
+    # layer_fired_pos = get_fired_pos(layer_feature_dist_kk, layer_feature_b, heat_map_init, vc_part_cnt, vc_part_p, vc_templates)
     
     for itt in range(15):
-        heat_map = get_heatmap(layer_fired_pos, max_0, max_1, max_2, blur=0.25, pctl = None, thrh = None)
+        heat_map = get_heatmap(layer_fired_pos, max_0, max_1, max_2, blur=0.5, pctl = None, thrh = None)
         vc_part_p = [[np.sum([not(layer_fired_pos[nn][vc_i][hmnn] is None) for nn in range(N)])/N for hmnn in range(vc_part_cnt[vc_i])]for vc_i in range(max_2)]
         sc, sc_d = get_score(layer_feature_dist_kk, layer_fired_pos, heat_map, vc_templates, vc_part_cnt, vc_part_p)
         print(sc, sc_d)
@@ -343,7 +344,7 @@ for kk in range(K):
         layer_fired_pos = get_fired_pos(layer_feature_dist_kk, layer_feature_b, heat_map, vc_part_cnt, vc_part_p, vc_templates)
     
     
-    heat_map = get_heatmap(layer_fired_pos, max_0, max_1, max_2, blur=0.25, pctl = None, thrh = None)
+    heat_map = get_heatmap(layer_fired_pos, max_0, max_1, max_2, blur=0.5, pctl = None, thrh = None)
     vc_part_p = [[np.sum([not(layer_fired_pos[nn][vc_i][hmnn] is None) for nn in range(N)])/N for hmnn in range(vc_part_cnt[vc_i])] for vc_i in range(max_2)]
     sc, sc_d = get_score(layer_feature_dist_kk, layer_fired_pos, heat_map, vc_templates, vc_part_cnt, vc_part_p)
     print(sc, sc_d)

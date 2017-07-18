@@ -6,9 +6,7 @@ import scipy.io as sio
 from FeatureExtractor import *
 from config_voting import *
 
-def extractLayerFeatVC(category_ls, set_type, scale_size=224):
-    extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='vgg16', which_layer=VC['layer'], which_snapshot=0)
-    
+def extractLayerVC(category_ls, set_type):
     assert(os.path.isfile(Dictionary_car))
     with open(Dictionary_car, 'rb') as fh:
         _,centers,_ = pickle.load(fh)
@@ -27,33 +25,17 @@ def extractLayerFeatVC(category_ls, set_type, scale_size=224):
         img_num = len(img_list)
         print('total number of images for {1}: {0}'.format(img_num, category))
         
-        feat_set = [None for nn in range(img_num)]
+        
+        featfile = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_carVC.pickle'.format(category, dataset_suffix, set_type))
+        with open(featfile, 'rb') as fh:
+            feat_set, _ = pickle.load(fh)
+        
+        assert(len(feat_set)==img_num)
+        
         r_set = [None for nn in range(img_num)]
         for nn in range(img_num):
-            file_img = os.path.join(dir_img, '{0}.JPEG'.format(img_list[nn][0]))
-            assert(os.path.isfile(file_img))
-            img = cv2.imread(file_img)
-            # plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-            # plt.show()
-            
-            height, width = img.shape[0:2]
-            
-            file_anno = os.path.join(dir_anno, '{0}.mat'.format(img_list[nn][0]))
-            assert(os.path.isfile(file_anno))
-            mat_contents = sio.loadmat(file_anno)
-            record = mat_contents['record']
-            objects = record['objects']
-            bbox = objects[0,0]['bbox'][0,int(img_list[nn][1])-1][0]
-            bbox = [max(math.ceil(bbox[0]), 1), max(math.ceil(bbox[1]), 1), \
-                    min(math.floor(bbox[2]), width), min(math.floor(bbox[3]), height)]
-            patch = img[bbox[1]-1: bbox[3], bbox[0]-1: bbox[2], :]
-            # patch = cv2.resize(patch, (scale_size, scale_size))
-            patch = myresize(patch, scale_size, 'short')
-            
-            layer_feature = extractor.extract_feature_image(patch)[0]
-            iheight, iwidth = layer_feature.shape[0:2]
-            assert(featDim == layer_feature.shape[2])
-            feat_set[nn] = layer_feature
+            layer_feature = np.copy(feat_set[nn])
+            iheight,iwidth = layer_feature.shape[0:2]
             
             layer_feature = layer_feature.reshape(-1, featDim)
             feat_norm = np.sqrt(np.sum(layer_feature**2, 1)).reshape(-1,1)
@@ -67,10 +49,9 @@ def extractLayerFeatVC(category_ls, set_type, scale_size=224):
                 print(nn, end=' ')
                 sys.stdout.flush()
             
-            
         print('\n')
         
-        file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_car_{3}_vMFMM.pickle'.format(category, dataset_suffix, set_type, VC['layer']))
+        file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_carVC_vMFMM30.pickle'.format(category, dataset_suffix, set_type))
         with open(file_cache_feat, 'wb') as fh:
             pickle.dump([feat_set, r_set], fh)
             
@@ -78,4 +59,4 @@ def extractLayerFeatVC(category_ls, set_type, scale_size=224):
 if __name__=='__main__':
     # objs = ['car','aeroplane','bicycle','bus','motorbike','train']
     objs = ['car']
-    extractLayerFeatVC(objs, 'train')
+    extractLayerVC(objs, 'train')

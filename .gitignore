@@ -2,6 +2,7 @@ qing_voting/intermediate/
 qing_voting_py/intermediate/
 qing_voting_py/data/
 qing_voting_py/cache/
+qing_voting_py/pool3_empty_examples/
 CAE/
 __*
 .*

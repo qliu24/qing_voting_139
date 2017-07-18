@@ -19,12 +19,11 @@ def generate_res_info_files(category_ls, set_type):
         img_num = len(img_list)
         print('total number of images for {1}: {0}'.format(img_num, category))
         
-        FCD_tmp = '/export/home/qliu24/qing_voting_data/intermediate/feat_alex'
-        # file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_gray200.pickle'.format(category, dataset_suffix, set_type))
-        file_cache_feat = os.path.join(FCD_tmp, '{0}_{1}_{2}_gray200.pickle'.format(category, dataset_suffix, set_type))
+        # FCD_tmp = '/export/home/qliu24/qing_voting_data/intermediate/feat_alex'
+        file_cache_feat = os.path.join(Feat['cache_dir'], '{0}_{1}_{2}_carVC_vMFMM30.pickle'.format(category, dataset_suffix, set_type))
         assert(os.path.isfile(file_cache_feat))
         with open(file_cache_feat, 'rb') as fh:
-            feat_set, r_set = pickle.load(fh)
+            _, r_set = pickle.load(fh)
             
         
         layer_feature_dist = [None for nn in range(img_num)]
@@ -51,11 +50,11 @@ def generate_res_info_files(category_ls, set_type):
             
         print('\n')
         
-        sfile = VC['res_info'].format(category,set_type+'_gray200')
+        sfile = VC['res_info'].format(category,set_type+'_carVC_vMFMM30')
         with open(sfile, 'wb') as fh:
             pickle.dump([layer_feature_dist, sub_type, view_point], fh)
             
 if __name__=='__main__':
-    objs = ['car','aeroplane','bicycle','bus','motorbike','train']
-    # objs = ['car']
+    # objs = ['car','aeroplane','bicycle','bus','motorbike','train']
+    objs = ['car']
     generate_res_info_files(objs, 'train')

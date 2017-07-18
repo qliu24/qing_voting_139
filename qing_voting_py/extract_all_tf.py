@@ -7,7 +7,7 @@ from FeatureExtractor import FeatureExtractor
 sys.path.insert(0, './')
 
 check_num = 1000  # save how many images to one file
-samp_size = 100  # number of features per image
+samp_size = 300  # number of features per image
 scale_size = 224
 
 # Specify the dataset
@@ -18,7 +18,7 @@ with open(Dict['file_list'], 'r') as fh:
 img_num = len(image_path)
 print('total images number : {0}'.format(img_num))
 
-extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='alexnet', which_layer=VC['layer'], which_snapshot=93000)
+extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='vgg16', which_layer=VC['layer'], which_snapshot=0)
 
 res = np.zeros((featDim, 0))
 loc_set = np.zeros((5, 0))
@@ -30,7 +30,7 @@ for ii in range(img_num):
     img = myresize(img, scale_size, 'short')
     img_set.append(deepcopy(img))
     
-    tmp = extractor.extract_feature_image(img, is_gray=True)[0]
+    tmp = extractor.extract_feature_image(img)[0]
     assert(tmp.shape[2]==featDim)
     height, width = tmp.shape[0:2]
     tmp = tmp[offset:height - offset, offset:width - offset, :]
@@ -55,7 +55,7 @@ for ii in range(img_num):
     
     if (ii + 1) % check_num == 0 or ii == img_num - 1:
         print('saving batch {0}/{1}'.format(ii//check_num+1, math.ceil(img_num/check_num)))
-        fnm = Dict['cache_path']+str(ii//check_num)+'_gray.pickle'
+        fnm = Dict['cache_path']+str(ii//check_num)+'.pickle'
         with open(fnm, 'wb') as fh:
             pickle.dump([res, loc_set, img_set], fh)
         

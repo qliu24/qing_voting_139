@@ -49,7 +49,7 @@ def evalVotingModelForObjDet2(model_category, category, set_type = 'test'):
     assert(img_num==len(gt))
     
     if category!='all':
-        file_det_result = os.path.join(dir_det_result, 'props_det_{0}_{1}_term3_blur_coef.pickle'.format(model_category, 'car'))
+        file_det_result = os.path.join(dir_det_result, 'props_det_{0}_{1}_term3_gmthrh9.pickle'.format(model_category, 'car'))
         # file_det_result = os.path.join(dir_det_result,'car_score_minus_bg.pickle')
         with open(file_det_result, 'rb') as fh:
             det = pickle.load(fh)
@@ -92,19 +92,20 @@ def evalVotingModelForObjDet2(model_category, category, set_type = 'test'):
         b_i = det[nn]['box']
         
         # adhoc thing
-        
-        si = np.argsort(-s_i)
-        hhi, wwi = det[nn]['img_siz']
-        topn = 3
-        bbox_area = np.zeros(topn)
-        for mm in range(topn):
-            bbmm = b_i[si[mm]]
-            bbmm = [max(math.ceil(bbmm[0]), 1), max(math.ceil(bbmm[1]), 1), \
-                    min(math.floor(bbmm[2]), wwi), min(math.floor(bbmm[3]), hhi)]
-            bbox_area[mm] = (bbmm[2]-bbmm[0])*(bbmm[3]-bbmm[1])
-            
-        biggest_i = np.argmax(bbox_area)
-        s_i[si[biggest_i]] += 60
+        adhoc = True
+        if adhoc == True:
+            si = np.argsort(-s_i)
+            hhi, wwi = det[nn]['img_siz']
+            topn = 3
+            bbox_area = np.zeros(topn)
+            for mm in range(topn):
+                bbmm = b_i[si[mm]]
+                bbmm = [max(math.ceil(bbmm[0]), 1), max(math.ceil(bbmm[1]), 1), \
+                        min(math.floor(bbmm[2]), wwi), min(math.floor(bbmm[3]), hhi)]
+                bbox_area[mm] = (bbmm[2]-bbmm[0])*(bbmm[3]-bbmm[1])
+
+            biggest_i = np.argmax(bbox_area)
+            s_i[si[biggest_i]] += 60
         
         nms_list = nms(np.column_stack([b_i, s_i]), nms_thrh)
         # nms_list = nms_list_all2[nn]

@@ -2,23 +2,24 @@ import numpy as np
 from scipy.misc import logsumexp
 
 def normalize_features(features):
-    '''features: n by d matrix'''
+    '''features is N by d matrix'''
     assert(len(features.shape)==2)
     return features/np.sqrt(np.sum(features**2, axis=1).reshape(-1,1))
 
-class vMFMM:
+class vMFMM_hard:
     def __init__(self, cls_num, init_method = 'random'):
         self.cls_num = cls_num
         self.init_method = init_method
         
         
-    def fit(self, features, kappa, max_it=300, tol = 1e-6, normalized=False, verbose=True):
+    def fit(self, features, kappa, max_it, normalized = False, verbose=True):
         self.features = features
         if not normalized:
             self.features = normalize_features(features)
             
         self.n, self.d = self.features.shape
-        self.kappa = kappa
+        # self.kappa = np.sqrt(self.d/2)  # all clusters share the same concentration parameter
+        self.kappa2 = kappa
         
         self.pi = np.random.random(self.cls_num)
         self.pi /= np.sum(self.pi)
@@ -30,69 +31,41 @@ class vMFMM:
             print('start k++')
             centers = []
             centers_i = []
-            
-            rdn_index = np.random.choice(self.n, size=(100000,), replace=False)
-            
-            cos_dis = 1-np.dot(self.features[rdn_index], self.features[rdn_index].T)
+            cos_dis = 1-np.dot(self.features, self.features.T)
             print('finish cos_dis')
-            centers_i.append(np.random.choice(rdn_index))
+            centers_i.append(np.random.choice(self.n))
             centers.append(self.features[centers_i[0]])
             for i in range(self.cls_num-1):
                 if i%10==0:
                     print('k++ center {0}'.format(i))
                     
-                cdisidx = [np.where(rdn_index==cci)[0][0] for cci in centers_i]
-                prob = np.min(cos_dis[:,cdisidx], axis=1)**2
+                subset_idx = np.random.choice(self.n, size=(100,), replace=False)
+                
+                prob = np.min(cos_dis[subset_idx,:][:,centers_i], axis=1)**2
                 prob /= np.sum(prob)
-                centers_i.append(np.random.choice(rdn_index, p=prob))
+                centers_i.append(np.random.choice(subset_idx, p=prob))
                 centers.append(self.features[centers_i[-1]])
                 
             self.mu = np.array(centers)
-            del(cos_dis)
             print('finish k++')
             
-        self.mllk_rec = []
         for itt in range(max_it):
             self.e_step()
             self.m_step()
             if verbose and itt%1==0:
-                print("iter {0}: {1}".format(itt, self.mllk))
-                
-            self.mllk_rec.append(self.mllk)
-            if len(self.mllk_rec)>1 and self.mllk - self.mllk_rec[-2] < tol:
-                print("early stop at iter {0}, llk {1}".format(itt, self.mllk))
-                break
+                print("iter {0}: {1},{2}".format(itt, self.mllk, self.kappa))
             
             
-    def fit_soft(self, features, p, mu, pi, kappa, max_it=300, tol = 1e-6, normalized=False, verbose=True):
-        self.features = features
-        if not normalized:
-            self.features = normalize_features(features)
-            
-        self.p = p
-        self.mu = mu
-        self.pi = pi
-        self.kappa = kappa
-        
-        self.n, self.d = self.features.shape
-            
-        for itt in range(max_it):
-            self.e_step()
-            self.m_step()
-            if verbose and itt%20==0:
-                print("iter {0}: {1}".format(itt, self.mllk))
-                
-            self.mllk_rec.append(self.mllk)
-            if len(self.mllk_rec)>1 and self.mllk - self.mllk_rec[-2] < tol:
-                print("early stop at iter {0}, llk {1}".format(itt, self.mllk))
-                break
-                
-    
     def e_step(self):
         # update p
-        logP = np.dot(self.features, self.mu.T)*self.kappa + np.log(self.pi).reshape(1,-1)  # n by k
-        logP_norm = logP - logsumexp(logP, axis=1).reshape(-1,1)
-        self.p = np.exp(logP_norm)
+        logP = np.dot(self.features, self.mu.T)*self.kappa2 + np.log(self.pi).reshape(1,-1)  # n by k
+        # logP_norm = logP - logsumexp(logP, axis=1).reshape(-1,1)
+        # self.p = np.exp(logP_norm)
+        q = np.argmax(logP, axis=1)
+        self.p = np.zeros((self.n, self.cls_num))
+        for nn in range(self.n):
+            self.p[nn,q[nn]] = 1
+            
         self.mllk = np.mean(logsumexp(logP, axis=1))
         
         
@@ -105,9 +78,10 @@ class vMFMM:
         # for cc in range(self.cls_num):
         #     self.mu[cc] = np.sum(self.p[:,cc].reshape(-1,1) * self.features, axis=0)/np.sum(self.p[:,cc])
         
-        # r = np.mean(np.sqrt(np.sum(self.mu**2, axis=1))*self.pi)
+        r = np.mean(np.sqrt(np.sum(self.mu**2, axis=1))*self.pi)
         # r = np.mean(np.sqrt(np.sum(self.mu**2, axis=1))/(self.n*self.pi))
-        # self.kappa2 = (r*self.d-r**3)/(1-r**2)
+        
+        self.kappa = (r*self.d-r**3)/(1-r**2)
             
         self.mu = normalize_features(self.mu)
         

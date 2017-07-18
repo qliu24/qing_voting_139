@@ -1,6 +1,6 @@
 import glob
 from config_voting import *
-from comptScoreFuncs_term2 import *
+from comptScoreFuncs_term3 import *
 
 def testVotingForBBoxes2(model_category_ls, category_ls, set_type='test', model_type='mix'):
     for model_category in model_category_ls:
@@ -8,7 +8,7 @@ def testVotingForBBoxes2(model_category_ls, category_ls, set_type='test', model_
         
         assert(os.path.isfile(Model_file))
         with open(Model_file, 'rb') as fh:
-            heat_map, vc_part_p = pickle.load(fh)
+            heat_map, vc_part_p, vc_templates = pickle.load(fh)
             
         for category in category_ls:
             file_list = Dataset['{0}_list'.format(set_type)].format(category)
@@ -50,9 +50,9 @@ def testVotingForBBoxes2(model_category_ls, category_ls, set_type='test', model_
                         lfd = feat[cnt_img]['r'][jj]
                         lfb = get_encoding(lfd, 0.85)
                         if model_type=='single':
-                            det[nn]['score'][jj] = get_score(lfd, lfb, heat_map, vc_part_p)
+                            det[nn]['score'][jj] = get_score(lfd, lfb, heat_map, vc_part_p, vc_templates)
                         elif model_type=='mix':
-                            det[nn]['score'][jj] = get_scoreM(lfd, lfb, heat_map, vc_part_p)
+                            det[nn]['score'][jj] = get_scoreM(lfd, lfb, heat_map, vc_part_p, vc_templates)
                         else:
                             sys.exit('Error: unknown model type')
                             
@@ -66,7 +66,7 @@ def testVotingForBBoxes2(model_category_ls, category_ls, set_type='test', model_
                     
             # assert(nn == img_num)
             
-            file_det_result = os.path.join(dir_det_result, 'props_det_{0}_{1}_term2_blur_coef.pickle'.format(model_category, category))
+            file_det_result = os.path.join(dir_det_result, 'props_det_{0}_{1}_term3_gmthrh9.pickle'.format(model_category, category))
             with open(file_det_result, 'wb') as fh:
                 pickle.dump(det, fh)
                 

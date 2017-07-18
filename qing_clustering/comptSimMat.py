@@ -8,20 +8,20 @@ import time
 paral_num=20
 # file_path = '/media/zzs/4TB/qingliu/qing_intermediate/feat_pickle/'
 # file_path = '/mnt/4T-HD/qing/voting_data/feat_pickle/'
-file_path = '/export/home/qliu24/qing_voting_data/intermediate/feat_pickle_alex/'
-savename = file_path + 'all_simmat_mthrh048.pickle'
-magic_thh = 0.48
+file_path = '/export/home/qliu24/qing_voting_data/intermediate/feat_car/'
+savename = file_path + 'simmat_vMFMM30_mthrh045.pickle'
+magic_thh = 0.45
 
 layer_feature_dist = []
-objects = ['car', 'aeroplane', 'bicycle', 'bus', 'motorbike', 'train']
-# objects = ['car']
+# objects = ['car', 'aeroplane', 'bicycle', 'bus', 'motorbike', 'train']
+objects = ['car']
+
 for oo in objects:
-    fname = file_path + 'res_info_' + oo + '_train_gray200.pickle'
+    fname = file_path + '{0}_mergelist_rand_train_carVC_vMFMM30.pickle'.format(oo)
     print('loading object {0}'.format(oo))
     with open(fname, 'rb') as fh:
-        l, _, _ = pickle.load(fh)
+        _, l = pickle.load(fh)
         layer_feature_dist += l
-        
         
 N = len(layer_feature_dist)
 print('total number of instances {0}'.format(N))
