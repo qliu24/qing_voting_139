@@ -10,7 +10,7 @@ def my_bn(x, is_training):
     return slim.batch_norm(x, is_training=is_training)
 
 
-def vgg_arg_scope(bn=False, weight_decay=0.00005, is_training=True):
+def vgg_arg_scope(padding, bn=False, weight_decay=0.00005, is_training=True):
     """Defines the VGG arg scope.
 
     Args:
@@ -27,10 +27,10 @@ def vgg_arg_scope(bn=False, weight_decay=0.00005, is_training=True):
                         weights_initializer=tf.contrib.layers.variance_scaling_initializer(),
                         biases_initializer=tf.zeros_initializer()):
         if bn:
-            with slim.arg_scope([slim.conv2d], padding='VALID', normalizer_fn=lambda x: my_bn(x, is_training=is_training)) as arg_sc:
+            with slim.arg_scope([slim.conv2d], padding=padding, normalizer_fn=lambda x: my_bn(x, is_training=is_training)) as arg_sc:
                 return arg_sc
         else:
-            with slim.arg_scope([slim.conv2d], padding='VALID') as arg_sc:
+            with slim.arg_scope([slim.conv2d], padding=padding) as arg_sc:
                 return arg_sc
 
 
@@ -62,8 +62,8 @@ def vgg_16(inputs, is_training=True, spatial_squeeze=True):
         net = slim.max_pool2d(net, [2, 2], scope='pool2')
         net = slim.repeat(net, 3, slim.conv2d, 256, [3, 3], scope='conv3')
         net = slim.max_pool2d(net, [2, 2], scope='pool3')
-        # net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv4')
-        # net = slim.max_pool2d(net, [2, 2], scope='pool4')
+        net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv4')
+        net = slim.max_pool2d(net, [2, 2], scope='pool4')
         # net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv5')
         # net = slim.max_pool2d(net, [2, 2], scope='pool5')
 
@@ -80,6 +80,7 @@ def vgg_16(inputs, is_training=True, spatial_squeeze=True):
         # for op in tf.get_default_graph().as_graph_def().node:
         #     print(str(op.name))
         return net, end_points
+    
 
 '''
 def alexnet(inputs, is_training=True, spatial_squeeze=True):
@@ -128,4 +129,4 @@ def alexnet(inputs, is_training=True, spatial_squeeze=True):
         return net, end_points
 '''
 
-vgg_16.default_image_size = 44
+vgg_16.default_image_size = 224

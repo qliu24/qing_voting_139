@@ -3,15 +3,15 @@ from vMFMM import *
 import pickle
 
 cluster_num = 200
-file_num = 1
-featDim = 256
-Arf = 44
+file_num = 6
+featDim = 512
+Arf = 100
 feat_set = np.zeros((featDim, 0))
 loc_set = np.zeros((5, 0), dtype='int')
 img_set = []
 for ii in range(file_num):
     print('loading file {0}/{1}'.format(ii+1, file_num))
-    fname = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/pool3_all_dumped_data'+str(ii)+'.pickle'
+    fname = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/pool4_all_dumped_data'+str(ii)+'.pickle'
     with open(fname, 'rb') as fh:
         res, iloc, iimg = pickle.load(fh)
         feat_set = np.column_stack((feat_set, res))
@@ -25,7 +25,7 @@ print(feat_set.shape)
 model = vMFMM(cluster_num,'k++')
 model.fit(feat_set, 30)
 
-save_path = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_pool3_K200_vMFMM30.pickle'
+save_path = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_all_VGG16_pool4_K200_vMFMM30.pickle'
 with open(save_path, 'wb') as fh:
     pickle.dump([model.p, model.mu, model.pi], fh)
 

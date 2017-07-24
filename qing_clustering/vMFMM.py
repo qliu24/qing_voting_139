@@ -100,7 +100,13 @@ class vMFMM:
         # update pi and mu
         self.pi = np.sum(self.p, axis=0)/self.n
         
-        self.mu = np.sum(np.tile(self.features.reshape(self.n,1,self.d),(1,self.cls_num,1))*self.p.reshape(self.n,self.cls_num,1),axis=0)/np.sum(self.p, axis=0).reshape(-1,1)
+        # fast version, requires more memory
+        # self.mu = np.sum(np.tile(self.features.reshape(self.n,1,self.d),(1,self.cls_num,1))*self.p.reshape(self.n,self.cls_num,1),axis=0)/np.sum(self.p, axis=0).reshape(-1,1)
+        
+        for dd_i in range(6):
+            dd_start = dd_i*100
+            dd_end = min((dd_i+1)*100, self.d)
+            self.mu[:,dd_start:dd_end] = np.sum(np.tile(self.features.reshape(self.n,1,self.d)[:,:,dd_start:dd_end],(1,self.cls_num,1))*self.p.reshape(self.n,self.cls_num,1),axis=0)/np.sum(self.p, axis=0).reshape(-1,1)
         
         # for cc in range(self.cls_num):
         #     self.mu[cc] = np.sum(self.p[:,cc].reshape(-1,1) * self.features, axis=0)/np.sum(self.p[:,cc])
