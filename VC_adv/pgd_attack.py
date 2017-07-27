@@ -34,7 +34,7 @@ class LinfPGDAttack:
            size a, while always staying within epsilon from the initial
            point."""
         
-        self.batch_size = 20
+        self.batch_size = 50
         self.scale_size = 100
         self.epsilon = epsilon  # noise radius
         self.k = k  # iter number
@@ -64,13 +64,9 @@ class LinfPGDAttack:
         features_norm = tf.reshape(features/tf.norm(features, axis=-1, keep_dims=True),[self.batch_size,-1])
         
         target = tf.reshape(tf.convert_to_tensor(target, dtype=tf.float32), [-1,1])
-        loss = tf.reduce_sum(1-tf.matmul(features_norm, target))
+        self.loss = tf.reduce_sum(1-tf.matmul(features_norm, target))
         
-        self.grad = tf.gradients(loss, self.x_input)[0]
-        
-        
-    def perturb(self, x_nat):
-        
+        self.grad = tf.gradients(self.loss, self.x_input)[0]
         
         
     def perturb_batch_images(self, batch_images):
@@ -79,14 +75,17 @@ class LinfPGDAttack:
             feed_dict = {self.x_input: x}
             grad = self.sess.run(self.grad, feed_dict=feed_dict)
             
-            x += self.a * np.sign(grad)
+            x -= self.a * np.sign(grad)
             x = np.clip(x, batch_images - self.epsilon, batch_images + self.epsilon) 
-            x = np.clip(x, 0, 255) # ensure valid pixel range
+            # x = np.clip(x, 0, 255) # ensure valid pixel range
+            if i%100==0:
+                loss_i = self.sess.run(self.loss, feed_dict={self.x_input: x})
+                print('iter {}: loss {}'.format(i, loss_i))
 
         return x
 
-    def extract_from_images(self, images):
-        image_list = []
+    def perturb(self, images):
+        output_list = []
         for i in range(-(-images.shape[0] // self.batch_size)):
             batch_images = np.ndarray([self.batch_size, self.scale_size, self.scale_size, 3])
             for j in range(self.batch_size):
@@ -96,16 +95,9 @@ class LinfPGDAttack:
                     
                 batch_images[j] = images[i * self.batch_size + j, :, :, :]
                 
-            out_features = self.extract_from_batch_images(batch_images)
-            for k in range(len(self.features)):
-                feature_list[k].append(out_features[k])
-                
-            image_list.append(batch_images)
+            output_images = self.perturb_batch_images(batch_images)
+            output_list.append(output_images)
             
-        for k in range(len(self.features)):
-            feature_list[k] = np.concatenate(feature_list[k])
-            feature_list[k] = feature_list[k][:images.shape[0]]
-        # features = np.concatenate(feature_list)
-        out_images = np.concatenate(image_list)
-        out_images = out_images[:images.shape[0], :]
-        return feature_list, out_images
+        output_list = np.concatenate(output_list)
+        output_list = output_list[0:images.shape[0], :]
+        return output_list

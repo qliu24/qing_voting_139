@@ -2,20 +2,45 @@ from joblib import Parallel, delayed
 import pickle
 import numpy as np
 import math
+from scipy.spatial.distance import cdist
 from vcdist_funcs import *
 import time
 
-paral_num=20
+paral_num=30
 file_path = '/export/home/qliu24/VC_adv_data/cihang/adv_cls_patches/'
-savename = file_path + 'simmat_vMFMM30_mthrh046.pickle'
-magic_thh = 0.46
+savename = file_path + 'simmat_carplane_vMFMM30_mthrh047_allVC.pickle'
+magic_thh = 0.47
 
-fname = file_path + 'pool4FeatVC.pickle'
+fname = file_path + 'pool4FeatVC_car.pickle'
 with open(fname, 'rb') as fh:
-    _, r_set_ori, _, r_set_fake = pickle.load(fh)
-        
-N = len(r_set_ori)
+    layer_feature_ori, _, layer_feature_fake, _ = pickle.load(fh)
+
+fname = file_path + 'pool4FeatVC_aeroplane.pickle'
+with open(fname, 'rb') as fh:
+    layer_feature_ap = pickle.load(fh)
+    
+dict_file='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_all_VGG16_pool4_K200_vMFMM30.pickle'
+with open(dict_file, 'rb') as fh:
+    _, centers, _ = pickle.load(fh)
+
+layer_feature_ori = layer_feature_ori[0:1000] + layer_feature_ap
+layer_feature_fake = layer_feature_fake[0:1000] + layer_feature_ap
+
+N = len(layer_feature_ori)
 print('total number of instances {0}'.format(N))
+
+r_set_ori = [None for nn in range(N)]
+r_set_fake = [None for nn in range(N)]
+for nn in range(N):
+    iheight,iwidth = layer_feature_ori[nn].shape[0:2]
+    lff = layer_feature_ori[nn].reshape(-1, 512)
+    lff_norm = lff/np.sqrt(np.sum(lff**2, 1)).reshape(-1,1)
+    r_set_ori[nn] = cdist(lff_norm, centers, 'cosine').reshape(iheight,iwidth,-1)
+    
+    iheight,iwidth = layer_feature_fake[nn].shape[0:2]
+    lff = layer_feature_fake[nn].reshape(-1, 512)
+    lff_norm = lff/np.sqrt(np.sum(lff**2, 1)).reshape(-1,1)
+    r_set_fake[nn] = cdist(lff_norm, centers, 'cosine').reshape(iheight,iwidth,-1)
 
 layer_feature_b_ori = [None for nn in range(N)]
 layer_feature_b_fake = [None for nn in range(N)]

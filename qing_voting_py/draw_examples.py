@@ -3,13 +3,13 @@ import numpy as np
 import cv2
 
 # fname='/mnt/4T-HD/qing/intermediate/feat/all_mergelist_rand_both_example.pickle'
-fname='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_pool3_K200_vMFMM30_example.pickle'
+fname='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_all_VGG16_pool4_K200_vMFMM30_example.pickle'
 with open(fname,'rb') as fh:
     example = pickle.load(fh)
 
 print(len(example))
 
-Arf = 44
+Arf = 100
 
 for ii in range(len(example)):
     big_img = np.zeros((10+(Arf+10)*4, 10+(Arf+10)*5, 3))
@@ -23,5 +23,5 @@ for ii in range(len(example)):
         cnum = 10+bb*(Arf+10)
         big_img[rnum:rnum+Arf, cnum:cnum+Arf, :] = example[ii][:,iis].reshape(Arf,Arf,3).astype(int)
 
-    fname = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/examples_K200_car_vMFMM30_pool3/example_K' + str(ii) + '.png'
+    fname = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/examples_K200_all_vMFMM30/example_K' + str(ii) + '.png'
     cv2.imwrite(fname, big_img)

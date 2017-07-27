@@ -11,7 +11,7 @@ from FeatureExtractor_full import *
 scale_size = 224
 featDim = 512
 
-savefile = '/export/home/qliu24/VC_adv_data/cihang/adv_cls_patches/pool4FeatVC_aeroplane.pickle'
+savefile = '/export/home/qliu24/VC_adv_data/cihang/adv_cls_patches/pool4FeatVC_aeroplane_test.pickle'
 
 model_cache_folder = '/export/home/qliu24/qing_voting_139/qing_voting_py/cache/'
 extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='vgg16', which_layer='pool4')
@@ -26,7 +26,7 @@ with open(Dictionary_car, 'rb') as fh:
 dir_anno = '/export/home/qliu24/dataset/PASCAL3D+_release1.1/Annotations/aeroplane_imagenet/'
 # dir_mat = '/export/home/qliu24/VC_adv_data/cihang/adv_cls_patches/adv_mat_file/'
 dir_img = '/export/home/qliu24/dataset/PASCAL3D+_release1.1/Images/aeroplane_imagenet/'
-file_list = '/export/home/qliu24/VC_adv_data/cihang/adv_cls_patches/aeroplane_mergelist_rand_train.txt'
+file_list = '/export/home/qliu24/VC_adv_data/cihang/adv_cls_patches/aeroplane_mergelist_rand_test.txt'
 with open(file_list, 'r') as fh:
     content = fh.readlines()
     

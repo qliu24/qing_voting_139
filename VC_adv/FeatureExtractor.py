@@ -49,7 +49,7 @@ class FeatureExtractor:
 
         vgg_var_scope = 'vgg_16'
         with tf.variable_scope(vgg_var_scope, reuse=False):
-            with slim.arg_scope(vgg.vgg_arg_scope(bn=False, is_training=False)):
+            with slim.arg_scope(vgg.vgg_arg_scope(padding='VALID', bn=False, is_training=False)):
                 _, _ = vgg.vgg_16(self.input_images, is_training=False)
         # self.pool4 = vgg_end_points['vgg_16/pool4']
         # with tf.variable_scope('VC', reuse=False):
