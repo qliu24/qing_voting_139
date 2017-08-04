@@ -37,7 +37,7 @@ class FeatureExtractor:
     def __init__(self, cache_folder, layer_names=['pool3/MaxPool:0', 'pool4/MaxPool:0']):
         # params
         self.batch_size = 20
-        self.scale_size = vgg.vgg_16.default_image_size
+        self.scale_size = 100
 
         # Runtime params
         checkpoints_dir = os.path.join(cache_folder, 'checkpoints_vgg')
@@ -50,7 +50,7 @@ class FeatureExtractor:
         vgg_var_scope = 'vgg_16'
         with tf.variable_scope(vgg_var_scope, reuse=False):
             with slim.arg_scope(vgg.vgg_arg_scope(padding='VALID', bn=False, is_training=False)):
-                _, _ = vgg.vgg_16(self.input_images, is_training=False)
+                _, _ = vgg.vgg_16_part(self.input_images, is_training=False)
         # self.pool4 = vgg_end_points['vgg_16/pool4']
         # with tf.variable_scope('VC', reuse=False):
         #     self.tight_loss, self.tight_end_points = online_clustering(self.pool4, 512)

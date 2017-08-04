@@ -1,13 +1,12 @@
-from config_voting import *
+from config_voting_ILSVRC12 import *
 import tensorflow as tf
 from tensorflow.python.client import timeline
 from datetime import datetime
 from copy import *
 from FeatureExtractor import FeatureExtractor
-sys.path.insert(0, './')
 
-check_num = 1000  # save how many images to one file
-samp_size = 100  # number of features per image
+check_num = 2000  # save how many images to one file
+samp_size = 50  # number of features per image
 scale_size = 224
 
 # Specify the dataset
@@ -22,13 +21,11 @@ extractor = FeatureExtractor(cache_folder=model_cache_folder, which_net='vgg16',
 
 res = np.zeros((featDim, 0))
 loc_set = np.zeros((5, 0))
-img_set = []
 
 for ii in range(img_num):
-    img = cv2.imread(image_path[ii])
+    img = cv2.imread(os.path.join(Dict['file_dir'], image_path[ii]))
     # img = cv2.resize(img, (scale_size, scale_size))
     img = myresize(img, scale_size, 'short')
-    img_set.append(deepcopy(img))
     
     tmp = extractor.extract_feature_image(img)[0]
     assert(tmp.shape[2]==featDim)
@@ -57,12 +54,11 @@ for ii in range(img_num):
         print('saving batch {0}/{1}'.format(ii//check_num+1, math.ceil(img_num/check_num)))
         fnm = Dict['cache_path']+str(ii//check_num)+'.pickle'
         with open(fnm, 'wb') as fh:
-            pickle.dump([res, loc_set, img_set], fh)
+            pickle.dump([res, loc_set], fh)
         
         res = np.zeros((featDim, 0))
         loc_set = np.zeros((5, 0))
-        img_set = []
         
-    if ii%20==0:
-        print(ii, end=' ')
-        sys.stdout.flush()
+    if ii%50==0:
+        print(ii, end=' ', flush=True)
+

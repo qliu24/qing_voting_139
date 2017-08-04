@@ -88,6 +88,16 @@ def vc_dis_sym2(inpar):
         rst2_nodeform = n3/n1
     
     return (np.mean([rst1_deform, rst2_deform]), np.mean([rst1_nodeform, rst2_nodeform]))
+
+def vc_dis_paral(inpar):
+    inst_ls, idx = inpar
+    rst1 = np.ones(len(inst_ls))
+    rst2 = np.ones(len(inst_ls))
+    for nn in range(idx+1, len(inst_ls)):
+        rst1[nn], rst2[nn] = vc_dis_sym2((inst_ls[idx], inst_ls[nn]))
+        
+    return (rst1, rst2)
+
     
 def vc_dis_both(inst1, inst2):
     # inst1 = inst1[:,:,0:14]

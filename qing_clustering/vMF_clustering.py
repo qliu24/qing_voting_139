@@ -2,32 +2,32 @@ import numpy as np
 from vMFMM import *
 import pickle
 
-cluster_num = 200
-file_num = [0,1,2,4,5]
+cluster_num = 512
+file_num = 7
 featDim = 512
 Arf = 100
 feat_set = np.zeros((featDim, 0))
 loc_set = np.zeros((5, 0), dtype='int')
-img_set = []
-for ii in file_num:
+for ii in range(file_num):
     print('loading file {0}'.format(ii))
-    fname = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/pool4_all_dumped_data'+str(ii)+'.pickle'
+    fname = '/export/home/qliu24/ILSVRC12_VC/feat/pool4_all_dumped_data{}.pickle'.format(ii)
     with open(fname, 'rb') as fh:
-        res, iloc, iimg = pickle.load(fh)
+        res, iloc = pickle.load(fh)
         feat_set = np.column_stack((feat_set, res))
         loc_set = np.column_stack((loc_set, iloc.astype('int')))
-        img_set += iimg
 
 print('all feat_set')
 feat_set = feat_set.T
 print(feat_set.shape)
 
 model = vMFMM(cluster_num,'k++')
-model.fit(feat_set, 30, max_it=200)
+model.fit(feat_set, 30, max_it=150)
 
-save_path = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_nobus_VGG16_pool4_K200_vMFMM30.pickle'
+save_path = '/export/home/qliu24/ILSVRC12_VC/dictionary/dictionary_ILSVRC12_VGG16_pool4_K512_vMFMM30.pickle'
 with open(save_path, 'wb') as fh:
     pickle.dump([model.p, model.mu, model.pi], fh)
+
+############## save examples ###################
 
 num = 50
 print('save top {0} images for each cluster'.format(num))

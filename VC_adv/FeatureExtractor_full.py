@@ -49,7 +49,7 @@ class FeatureExtractor:
             if which_snapshot == 0:  # Start from a pre-trained vgg ckpt
                 with tf.variable_scope(vgg_var_scope, reuse=False):
                     with slim.arg_scope(vgg.vgg_arg_scope(padding='SAME', bn=False, is_training=False)):
-                        _, _ = vgg.vgg_16(self.input_images, is_training=False)
+                        _, _ = vgg.vgg_16_part(self.input_images, is_training=False)
                     
                 self.features = tf.get_default_graph().get_tensor_by_name(vgg_var_scope + '/' + which_layer + '/MaxPool:0')
                 
@@ -106,7 +106,7 @@ class FeatureExtractor:
         print(str(datetime.now()) + ': Finish Init')
     
     
-    def extract_feature_image(self, img, is_gray=False):
+    def extract_feature_image(self, img, is_gray=False, centered = False):
         assert(self.batch_size == 1)
         h, w, c = img.shape
         assert c == 3
@@ -117,7 +117,8 @@ class FeatureExtractor:
         # img = cv2.resize(img, (self.scale_size, self.scale_size))
         
         img = img.astype(np.float32)
-        img -= self.img_mean
+        if not centered:
+            img -= self.img_mean
             
         feed_dict = {self.input_images: [img]}
         out_features = self.sess.run(self.features, feed_dict=feed_dict)

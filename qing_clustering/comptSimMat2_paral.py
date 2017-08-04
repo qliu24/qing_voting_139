@@ -6,7 +6,7 @@ from scipy.spatial.distance import cdist
 from vcdist_funcs import *
 import time
 
-category = 'car'
+category = 'aeroplane'
 paral_num = 30
 file_path = '/export/home/qliu24/VC_adv_data/qing/VGG_adv/feat/'
 savename = file_path + 'simmat_{}_mthrh047_allVC.pickle'.format(category)

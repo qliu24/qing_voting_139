@@ -105,7 +105,7 @@ class vMFMM:
         
         for dd_i in range(5):
             dd_start = dd_i*110
-            dd_end = min((dd_i+1)*100, self.d)
+            dd_end = min((dd_i+1)*110, self.d)
             self.mu[:,dd_start:dd_end] = np.sum(np.tile(self.features.reshape(self.n,1,self.d)[:,:,dd_start:dd_end],(1,self.cls_num,1))*self.p.reshape(self.n,self.cls_num,1),axis=0)/np.sum(self.p, axis=0).reshape(-1,1)
         
         # for cc in range(self.cls_num):

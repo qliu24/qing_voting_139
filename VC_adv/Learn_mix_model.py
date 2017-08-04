@@ -6,29 +6,23 @@ from scipy.spatial.distance import cdist
 category='aeroplane'
 K = 4
 magic_thh = 0.47
-file_path = '/export/home/qliu24/VC_adv_data/cihang/adv_cls_patches/'
-sim_fname = file_path + 'simmat_carplane_vMFMM30_mthrh047_allVC.pickle'
-# sim_fname = file_path + 'simmat_car_vMFMM30_mthrh046_carVC.pickle'
+file_path = '/export/home/qliu24/VC_adv_data/qing/VGG_adv/feat/'
+sim_fname = file_path + 'simmat_{}_mthrh047_allVC.pickle'.format(category)
 savename = file_path + 'mix_model/{}_K{}_notrain.pickle'.format(category, K)
-feat_fname = file_path + 'pool4FeatVC_{}.pickle'.format(category)
+feat_fname = file_path + 'pool4FeatVC_{}_train.pickle'.format(category)
 
 dict_file='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_all_VGG16_pool4_K200_vMFMM30.pickle'
 # dict_file='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_pool4_K200_vMFMM30.pickle'
 
 # Spectral clustering based on the similarity matrix
 with open(sim_fname, 'rb') as fh:
-    mat_dis1, _, _, _ = pickle.load(fh)
-    
-mat_dis1 = mat_dis1[1000:][:,1000:]
+    mat_dis1, _ = pickle.load(fh)
 
 mat_dis = mat_dis1
 N = mat_dis.shape[0]
 print('total number of instances {0}'.format(N))
 
-mat_full = np.ones_like(mat_dis)
-for nn in range(N):
-    mat_full[nn] = np.append(mat_dis[0:nn, nn], mat_dis[nn, nn:])
-    
+mat_full = mat_dis + mat_dis.T - np.ones((N,N))
 np.fill_diagonal(mat_full, 0)
 
 W_mat = 1. - mat_full
@@ -65,7 +59,6 @@ rst_lbs = rst_lbs.astype('int')
 with open(feat_fname, 'rb') as fh:
     layer_feature = pickle.load(fh)
     
-layer_feature = layer_feature[0:1000]
 with open(dict_file, 'rb') as fh:
     _, centers, _ = pickle.load(fh)
 

@@ -49,7 +49,7 @@ class LinfPGDAttack:
         
         with tf.variable_scope(vgg_var_scope, reuse=False):
             with slim.arg_scope(vgg.vgg_arg_scope(padding='VALID', bn=False, is_training=False)):
-                _, _ = vgg.vgg_16(self.x_input, is_training=False)
+                _, _ = vgg.vgg_16_part(self.x_input, is_training=False)
 
         restorer = get_init_restorer(bn=False, vc=False)
         config = tf.ConfigProto()
