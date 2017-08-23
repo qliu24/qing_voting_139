@@ -2,7 +2,7 @@ import numpy as np
 from vMFMM import *
 import pickle
 
-cluster_num = 200
+cluster_num = 150
 file_num = 1
 featDim = 512
 feat_set = np.zeros((featDim, 0))
@@ -24,7 +24,7 @@ print(feat_set.shape)
 model = vMFMM(cluster_num,'k++')
 model.fit(feat_set, 16, 50)
 
-save_path = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_pool4_K200_vMFMM16_2.pickle'
+save_path = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_car_VGG16_pool4_K{}_vMFMM16_2.pickle'.format(K)
 with open(save_path, 'wb') as fh:
     pickle.dump([model.p, model.mu, model.pi], fh)
 

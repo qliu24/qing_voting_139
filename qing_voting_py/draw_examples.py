@@ -1,13 +1,20 @@
 import pickle
 import numpy as np
 import cv2
+import os
 
-# fname='/mnt/4T-HD/qing/intermediate/feat/all_mergelist_rand_both_example.pickle'
-fname='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dictionary_PASCAL3D+_nobus_VGG16_pool4_K200_vMFMM30_example.pickle'
+category = 'train'
+fname='/export/home/qliu24/qing_voting_139/qing_voting_py/data/dict/dictionary_PASCAL3D+_{}_VGG16_pool4_K150_vMFMM30_example.pickle'.format(category)
+
 with open(fname,'rb') as fh:
     example = pickle.load(fh)
 
 print(len(example))
+
+savedir = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/dict/examples_K{}_{}/'.format(len(example), category)
+
+if not os.path.exists(savedir):
+    os.makedirs(savedir)
 
 Arf = 100
 
@@ -23,5 +30,5 @@ for ii in range(len(example)):
         cnum = 10+bb*(Arf+10)
         big_img[rnum:rnum+Arf, cnum:cnum+Arf, :] = example[ii][:,iis].reshape(Arf,Arf,3).astype(int)
 
-    fname = '/export/home/qliu24/qing_voting_139/qing_voting_py/data/examples_K200_nobus_vMFMM30/example_K' + str(ii) + '.png'
+    fname = savedir + 'example_K' + str(ii) + '.png'
     cv2.imwrite(fname, big_img)

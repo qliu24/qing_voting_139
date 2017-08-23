@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.misc import logsumexp
+import math
 
 def normalize_features(features):
     '''features: n by d matrix'''
@@ -30,8 +31,10 @@ class vMFMM:
             print('start k++')
             centers = []
             centers_i = []
-            
-            rdn_index = np.random.choice(self.n, size=(100000,), replace=False)
+            if self.n > 100000:
+                rdn_index = np.random.choice(self.n, size=(100000,), replace=False)
+            else:
+                rdn_index = np.arange(self.n).astype(int)
             
             cos_dis = 1-np.dot(self.features[rdn_index], self.features[rdn_index].T)
             print('finish cos_dis')
@@ -103,9 +106,12 @@ class vMFMM:
         # fast version, requires more memory
         # self.mu = np.sum(np.tile(self.features.reshape(self.n,1,self.d),(1,self.cls_num,1))*self.p.reshape(self.n,self.cls_num,1),axis=0)/np.sum(self.p, axis=0).reshape(-1,1)
         
-        for dd_i in range(5):
-            dd_start = dd_i*110
-            dd_end = min((dd_i+1)*110, self.d)
+        d_cut = 260
+        bnum = int(math.ceil(self.d/d_cut))
+        
+        for dd_i in range(bnum):
+            dd_start = dd_i*d_cut
+            dd_end = min((dd_i+1)*d_cut, self.d)
             self.mu[:,dd_start:dd_end] = np.sum(np.tile(self.features.reshape(self.n,1,self.d)[:,:,dd_start:dd_end],(1,self.cls_num,1))*self.p.reshape(self.n,self.cls_num,1),axis=0)/np.sum(self.p, axis=0).reshape(-1,1)
         
         # for cc in range(self.cls_num):
